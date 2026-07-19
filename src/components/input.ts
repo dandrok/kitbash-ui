@@ -64,6 +64,12 @@ export default defineComponent({
       outline: none;
       font-family: inherit;
       line-height: var(--kb-line-height-normal);
+      transition:
+        border-color 0.12s ease,
+        box-shadow 0.12s ease;
+    }
+    input:hover:not(:disabled):not(:read-only) {
+      border-color: var(--kitbash-input-border-focus);
     }
     :host([size="sm"]) input {
       min-height: 2rem;

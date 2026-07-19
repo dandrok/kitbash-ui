@@ -1,7 +1,7 @@
 import { defineComponent } from '@ktbsh/sdk';
 
 /**
- * Radio option (form-associated).
+ * Radio option (form-associated). Custom ring + center pip (not OS chrome).
  * Same `name` groups options across shadow roots (manual uncheck).
  */
 export default defineComponent({
@@ -32,34 +32,67 @@ export default defineComponent({
       user-select: none;
     }
     input {
-      appearance: auto;
-      width: 1.5rem;
-      height: 1.5rem;
-      min-width: 1.5rem;
-      min-height: 1.5rem;
+      appearance: none;
+      -webkit-appearance: none;
+      box-sizing: border-box;
+      width: 1.15em;
+      height: 1.15em;
+      min-width: 1.15em;
+      min-height: 1.15em;
       margin: 0;
       flex-shrink: 0;
-      accent-color: var(--kb-color-accent-default);
+      display: grid;
+      place-content: center;
+      border: 2px solid var(--kb-color-border-default);
+      border-radius: var(--kb-radius-full);
+      background: var(--kb-color-bg-canvas);
       cursor: pointer;
+      transition:
+        border-color 0.12s ease,
+        box-shadow 0.12s ease;
+    }
+    input::before {
+      content: '';
+      width: 0.55em;
+      height: 0.55em;
+      border-radius: var(--kb-radius-full);
+      transform: scale(0);
+      transition: transform 0.12s ease;
+      background: var(--kb-color-accent-default);
+      box-shadow: 0 0 0 1px var(--kb-color-accent-default);
+    }
+    input:hover:not(:disabled) {
+      border-color: var(--kb-color-border-focus);
+    }
+    input:checked {
+      border-color: var(--kb-color-accent-default);
+      background: var(--kb-color-accent-subtle);
+    }
+    input:checked::before {
+      transform: scale(1);
     }
     input:focus-visible {
       outline: none;
       box-shadow: var(--kb-focus-ring);
-      border-radius: var(--kb-radius-full);
     }
     input:disabled {
       cursor: not-allowed;
-      opacity: 0.55;
+      opacity: 0.5;
     }
-    input[aria-invalid="true"] {
-      outline: 1px solid var(--kb-color-danger-default);
+    input[aria-invalid='true'] {
+      border-color: var(--kb-color-danger-default);
     }
     .label {
       line-height: var(--kb-line-height-normal);
     }
+    @media (prefers-reduced-motion: reduce) {
+      input,
+      input::before {
+        transition: none;
+      }
+    }
   `,
   events: {
-    // Outer <label for> retargets onto the host only — not shadow UI
     click(e: Event) {
       const host = e.currentTarget as HTMLElement;
       if (e.composedPath()[0] !== host) return;
@@ -73,7 +106,6 @@ export default defineComponent({
       const name = typeof props.name === 'string' ? props.name : '';
 
       if (target.checked && name && typeof document !== 'undefined') {
-        // Group only within the same form (or both formless), not document-wide
         const formOwner = host.closest('form');
         const radios: HTMLElement[] = [];
         const walk = (root: ParentNode) => {

@@ -1,12 +1,11 @@
 import { defineComponent } from '@ktbsh/sdk';
 
 /**
- * Checkbox (form-associated). Label via slot text or external `<label>`.
- * `checked` is boolean; user toggles emit `kitbash-change` via `commit`.
+ * Checkbox (form-associated). Custom drawn control (not OS chrome).
+ * Label via slot text or external `<label>`.
  *
  * Known SDK limit: form value may still reflect the `value` prop when unchecked
- * until the compiler supports checked-aware `setFormValue`. Prefer reading
- * `checked` from `kitbash-change` in app state for authoritative form UX.
+ * until the compiler supports checked-aware `setFormValue`.
  */
 export default defineComponent({
   tag: 'kitbash-checkbox',
@@ -30,28 +29,72 @@ export default defineComponent({
       color: var(--kb-color-fg-default);
     }
     input {
-      width: 1.125rem;
-      height: 1.125rem;
-      min-width: 1.125rem;
-      min-height: 1.125rem;
+      appearance: none;
+      -webkit-appearance: none;
+      box-sizing: border-box;
+      width: 1.15em;
+      height: 1.15em;
+      min-width: 1.15em;
+      min-height: 1.15em;
       margin: 0;
-      accent-color: var(--kb-color-accent-default);
+      flex-shrink: 0;
+      display: grid;
+      place-content: center;
+      border: 2px solid var(--kb-color-border-default);
+      border-radius: var(--kb-radius-sm);
+      background: var(--kb-color-bg-canvas);
+      color: var(--kb-color-fg-on-accent);
       cursor: pointer;
+      transition:
+        background-color 0.12s ease,
+        border-color 0.12s ease,
+        box-shadow 0.12s ease;
+    }
+    input::before {
+      content: '';
+      width: 0.65em;
+      height: 0.65em;
+      transform: scale(0);
+      transition: transform 0.12s ease;
+      box-shadow: inset 1em 1em currentColor;
+      clip-path: polygon(
+        14% 44%,
+        0 65%,
+        50% 100%,
+        100% 16%,
+        80% 0%,
+        43% 62%
+      );
+    }
+    input:hover:not(:disabled) {
+      border-color: var(--kb-color-border-focus);
+    }
+    input:checked {
+      background: var(--kb-color-accent-default);
+      border-color: var(--kb-color-accent-default);
+    }
+    input:checked::before {
+      transform: scale(1);
     }
     input:focus-visible {
       outline: none;
       box-shadow: var(--kb-focus-ring);
-      border-radius: var(--kb-radius-sm);
     }
     input:disabled {
       cursor: not-allowed;
-      opacity: 0.55;
+      opacity: 0.5;
     }
-    input[aria-invalid="true"] {
-      outline: 1px solid var(--kb-color-danger-default);
+    input[aria-invalid='true'] {
+      border-color: var(--kb-color-danger-default);
     }
     .label {
       line-height: var(--kb-line-height-normal);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      input,
+      input::before {
+        transition: none;
+      }
     }
   `,
   events: {

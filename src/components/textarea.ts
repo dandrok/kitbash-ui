@@ -38,6 +38,12 @@ export default defineComponent({
       line-height: var(--kb-line-height-normal);
       resize: vertical;
       outline: none;
+      transition:
+        border-color 0.12s ease,
+        box-shadow 0.12s ease;
+    }
+    textarea:hover:not(:disabled):not(:read-only) {
+      border-color: var(--kb-color-border-focus);
     }
     textarea::placeholder {
       color: var(--kb-color-fg-subtle);
