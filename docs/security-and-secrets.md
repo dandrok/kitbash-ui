@@ -26,7 +26,7 @@ Copying values into `.env` does **not** make them available to Actions. Actions 
 You / CLI agent on your machine
   → branch, implement, review, commit, open PR
   → poll gh until MERGED
-  → pull main → next task from docs/TASKS.md
+  → pull default branch (master until rename → main) → next task from docs/TASKS.md
 ```
 
 - Secrets live in **local `.env`** (or `gh auth` / SSH).
@@ -142,8 +142,9 @@ cp .env.example .env
 
 # verify GitHub auth (either works):
 gh auth status
-# or
-export $(grep -v '^#' .env | xargs) && gh api user --jq .login
+# or export only GH_TOKEN from .env (never bulk `export $(grep … | xargs)`):
+export GH_TOKEN="$(sed -n 's/^GH_TOKEN=//p' .env | head -1 | tr -d '"' | tr -d "'")"
+gh api user --jq .login
 ```
 
 `.env` is already ignored via:
@@ -185,7 +186,8 @@ jobs:
     permissions:
       contents: read   # prefer AGENT_GITHUB_TOKEN for writes
     steps:
-      - uses: actions/checkout@v4
+      # Pin full SHA; comment keeps human-readable major.tag (v4 floating tag → this commit).
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
       - name: Next todo-ai issue
         env:
           GH_TOKEN: ${{ secrets.AGENT_GITHUB_TOKEN }}
