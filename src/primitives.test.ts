@@ -36,6 +36,10 @@ describe('primitive components', () => {
       'breadcrumb.ts',
       'nav.ts',
       'pagination.ts',
+      'theme-toggle.ts',
+      'preset-toggle.ts',
+      'toggle-group.ts',
+      'scroll-top.ts',
     ]) {
       expect(files.includes(name), name).toBe(true);
     }

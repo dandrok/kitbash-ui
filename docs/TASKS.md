@@ -21,7 +21,8 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 
 ## In progress / next
 
-- [ ] **Theme presets (astro-blog-md)** — terminal + default light/dark; see `docs/consumer-astro-blog-md.md` (`feat/theme-presets-blog`)
+- [ ] **Blog chrome** — theme/preset toggles, toggle-group, scroll-top (`feat/blog-chrome-toggles`)
+- [x] **Theme presets (astro-blog-md)** — terminal + default light/dark (PR #15, npm 0.2.0)
 - [x] **npm first release** — publish workflow + operator release
 - [ ] ~~Default branch rename `master` → `main`~~ — optional; skip unless desired
 
