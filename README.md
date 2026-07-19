@@ -1,52 +1,51 @@
-# Kitbash starter
+# @ktbsh/ui
 
-Scaffold for a small design-system project built with [`@ktbsh/sdk`](https://www.npmjs.com/package/@ktbsh/sdk).
+Framework-agnostic **design system** built with [`@ktbsh/sdk`](https://www.npmjs.com/package/@ktbsh/sdk).  
+Author once → vanilla custom elements + React wrappers + Custom Elements Manifest.
 
-Created by:
+| | |
+|--|--|
+| **Package** | `@ktbsh/ui` |
+| **Tags** | `kitbash-*` (production tags land with the primitives PR; scaffold still has `my-button` / `kitbash-input`) |
+| **Runtime** | Bun ≥ 1.3.14 |
 
-```bash
-kitbash init my-design-system
-# or
-bunx @ktbsh/sdk init my-design-system
-```
+Component playground and full prop docs will live in **Storybook** (not yet).  
+Agent/process rules: [`AGENTS.md`](./AGENTS.md). Architecture: [`docs/superpowers/specs/`](./docs/superpowers/specs/).
 
-## Project layout
+## Requirements
 
-```text
-.
-├── README.md
-├── kitbash.config.ts   # reserved for future config (not applied by the compiler yet)
-├── package.json
-└── src/
-    ├── tokens.json
-    └── components/
-        ├── button.ts
-        └── input.ts
-```
+- [Bun](https://bun.sh) **1.3.14+**
 
-## Next steps
+## Install & build
 
 ```bash
 bun install
 bun run build
 ```
 
-**Requires [Bun](https://bun.sh) ≥ 1.0.**
+Output:
 
-Output lands in `dist/`:
+```text
+dist/
+├── custom-elements.json
+├── vanilla/   # browser custom elements (uhtml bundled)
+└── react/     # React wrappers + .d.ts
+```
 
-- `dist/vanilla/*.js` — browser custom elements (`uhtml` bundled)
-- `dist/react/*.js` + `*.d.ts` — React wrappers
-- `dist/custom-elements.json` — IDE / CEM metadata
+## Scripts
 
-## Try the examples
+| Script | Purpose |
+|--------|---------|
+| `bun run build` | Compile components with kitbash |
+| `bun run dev` | Watch rebuild |
+| `bun run lint` / `format` / `ci` | Biome |
+| `bun run typecheck` | `tsc --noEmit` |
+| `bun run test` | Bun tests |
+| `bun run verify` | ci + typecheck + build |
 
-| File | Tag | Notes |
-|------|-----|--------|
-| `src/components/button.ts` | `my-button` | Variants, slot, click state |
-| `src/components/input.ts` | `kitbash-input` | `formAssociated`, focus delegation |
+## Consume (after build)
 
-**Vanilla:**
+**Vanilla**
 
 ```html
 <script type="module">
@@ -55,24 +54,28 @@ Output lands in `dist/`:
 <my-button variant="primary">Hello</my-button>
 ```
 
-**React:**
+**React**
 
 ```tsx
 import { MyButton } from './dist/react/button.js';
 
-<MyButton variant="primary" onClick={() => {}}>Hello</MyButton>
+<MyButton variant="primary">Hello</MyButton>
 ```
 
-## Add a component
+**Svelte** — import the vanilla custom element and use the tag in markup.
 
-1. Create `src/components/card.ts` with `export default defineComponent({ tag: 'my-card', … })`.
-2. Run `bun run build`.
-3. Import `dist/vanilla/card.js` or `dist/react/card.js`.
+## Authoring
 
-Full authoring API, theming, forms, and troubleshooting: the [**@ktbsh/sdk** README on npm](https://www.npmjs.com/package/@ktbsh/sdk).
+1. Add `src/components/<name>.ts` with `export default defineComponent({ tag: 'kitbash-…', … })`.
+2. Obey SDK rules: no outer closures in `render` / `events`.
+3. `bun run build`.
 
-## Notes
+Full compiler API: [@ktbsh/sdk on npm](https://www.npmjs.com/package/@ktbsh/sdk).
 
-- `kitbash.config.ts` is a placeholder; build always uses `src/components` → `dist/` for now.
-- Prefer property bindings like `.value=${props.value}` for inputs so focus is not lost on re-render.
-- Keep `render` / `events` free of outer closures (they are serialized into the compiled output).
+## CI
+
+GitHub Actions runs Biome, typecheck, and build on every push/PR to `master`.
+
+## License
+
+MIT

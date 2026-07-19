@@ -5,6 +5,8 @@
 > **Mode:** **Loop mode** — one coherent slice per branch/PR, dual review, then merge.
 >
 > **Security:** `@ktbsh/ui` must stay fully secure — no secrets in source, `dist/`, or Storybook. See `docs/security-and-secrets.md`.
+>
+> **⛔ NO COMMIT WITHOUT `agy`:** A second-LLM review via **`agy` (read-only)** is **mandatory before every commit**. Skipping is forbidden — even if CodeRabbit hangs, CI is green, or the change “looks small.”
 
 ---
 
@@ -102,7 +104,8 @@ Until rename lands, all agent/CI/`gh`/`cr` bases use **`master`**. After rename,
    git checkout -b <type>/<short-name>
    # types: feat | fix | chore | docs | ci | test
 
-3. Develop → verify → dual review → commit on the branch only
+3. Develop → verify → **`agy` read-only review** (required) → triage fixes → commit on the branch only
+   - **Never** `git commit` until `agy` has finished a pass on the pending changes.
 
 4. Push the branch and open a PR (this repo only)
    git push -u origin HEAD
@@ -120,8 +123,56 @@ Until rename lands, all agent/CI/`gh`/`cr` bases use **`master`**. After rename,
 | Keep the default branch matching `origin` | Leave local default ahead with private commits |
 | Use Path A: poll PR until merged, then next task | Stack unrelated work on one long-lived branch |
 | Keep `.env` local only; document vars in `.env.example` | Commit real tokens or put them in DS source |
+| Run **`agy` read-only before every commit** | Commit because “CI green” / “cr hung” / “docs only” without `agy` |
 
 If you already committed on the default branch by mistake: move commits to a feature branch, reset local default to `origin/<default>`, push the branch, open a PR. Never force-push the default branch unless the user explicitly requests it.
+
+---
+
+## ⛔ Mandatory second pair of eyes: `agy` (before every commit)
+
+This is as strict as the repository hard boundary.
+
+| Rule | Detail |
+|------|--------|
+| **When** | After local verify, **before** `git commit` — every time, every branch, every slice (code, docs, CI, nits) |
+| **Tool** | `agy` CLI — **read-only** review (must not edit the tree) |
+| **Not optional** | Do **not** skip if CodeRabbit fails/hangs, if the diff is “tiny”, or if you already self-reviewed |
+| **Order** | verify → local `cr` CLI if available (not the GitHub PR bot) → **`agy` (required)** → triage/fix → re-verify if fixed → **`agy` again if the fix was non-trivial** → only then commit |
+| **If `agy` fails to run** | **Do not commit.** Retry, fix the environment, or stop and tell the user. Never “commit anyway.” |
+| **Triage** | Fix real bugs and correctness nits; skip over-engineering that fights KISS |
+
+### Required `agy` invocation (copy/paste)
+
+**Model (mandatory):** `--model gemini-3.1-pro-high`  
+→ **Gemini 3.1 Pro (High)** — strongest 3.1 Pro tier; same pin as kitbash-sdk dual-review. Do **not** drop to Flash/Low for pre-commit review.
+
+```bash
+# From this repo only. Read-only. Do not edit files.
+agy --model gemini-3.1-pro-high \
+  --mode plan \
+  --sandbox \
+  --dangerously-skip-permissions \
+  --print-timeout 15m \
+  -p "READ-ONLY review of current uncommitted changes (and branch vs master if needed) in dandrok/kitbash-ui ONLY. Do not edit files. Do not touch other repos. Report: (1) real bugs/security (2) CI/config mistakes (3) nits worth fixing before commit (4) noise to ignore. Be concise."
+```
+
+Notes:
+
+- Prefer `--mode plan` (not accept-edits). Review must not silently rewrite the tree.
+- `--dangerously-skip-permissions` is only for headless tool access in review; still instruct **do not edit**.
+- `--print-timeout 15m` avoids false “timeout waiting for response” on larger diffs (default 5m is often too short).
+- If uncommitted is empty but the branch has unreviewed commits (process breach): run `agy` on `git diff master...HEAD`, fix, then commit the fixes — do not add more unreviewed work.
+- Optional heavier model (only if user asks): `claude-opus-4-6-thinking` or whatever `agy models` lists as Opus Thinking — default remains **`gemini-3.1-pro-high`**.
+
+### Forbidden rationalizations
+
+- “cr already ran” / “cr hung so I skipped dual review”
+- “docs-only / config-only”
+- “user is waiting”
+- “I’ll run agy after the PR”
+
+**After commit is too late for the gate.** PR review tools are extra, not a substitute for pre-commit `agy`.
 
 ---
 
@@ -137,13 +188,15 @@ If you already committed on the default branch by mistake: move commits to a fea
    - bun run typecheck && bun run ci && bun run test && bun run build
    - Include Storybook build when Storybook exists
 
-3. EXTERNAL REVIEW (before commit)
-   - CodeRabbit (if available): cr review --plain --base master
-     (After rename: --base main)
-   - Second LLM read-only review (must not edit files)
+3. EXTERNAL REVIEW (before commit) — HARD GATE
+   - Optional local CodeRabbit CLI (not the post-push PR bot):
+       cr review --plain --base master
+     (After rename: --base main). If `cr` hangs/fails, still run `agy` — never skip `agy`.
+   - **REQUIRED:** agy read-only review (command above)
    - Triage: fix real bugs; skip over-engineering noise
+   - Re-run local verify (+ agy if fixes were material)
 
-4. COMMIT (on the feature branch only)
+4. COMMIT (on the feature branch only) — only after step 3 passes
    - Clear message: why + what
    - No secrets; do not amend published history unless asked
 
@@ -153,6 +206,30 @@ If you already committed on the default branch by mistake: move commits to a fea
    - MERGED → checkout master (or main), pull, mark task done, next branch
    - CLOSED without merge → halt and report
 ```
+
+---
+
+## Craftsmanship (no rush, no trash, no security holes)
+
+**Speed never beats correctness.** Take the time the change needs. Prefer one solid slice over a sloppy pile of files.
+
+| Do | Don’t |
+|----|--------|
+| Read surrounding code and the design spec before editing | Drive-by “while I’m here” refactors |
+| KISS / DRY — smallest clear design that works | Clever abstractions, copy-paste twins, dead code |
+| Strong TypeScript types for public APIs and component props | `any`, silent casts, undocumented stringly APIs |
+| Semantic tokens, a11y basics, focus/disabled/invalid states | Hard-coded one-off styles or insecure HTML injection |
+| Verify fully, then **`agy --model gemini-3.1-pro-high`**, then commit | Rush commits, skip review, “fix later” |
+| Secrets never in source, `dist/`, Storybook, or logs | Tokens in env committed to git, XSS via untrusted HTML |
+
+**Security (product + process):**
+
+- No secrets in the package; least privilege for `gh` (this repo only).
+- Prefer text/slots over HTML injection; if rich HTML ever appears, sanitize and document.
+- Pin deps and Actions SHAs; frozen lockfile in CI.
+- Destructive git only with explicit user ask for **this** repo.
+
+**Code quality bar for `@ktbsh/ui`:** professional design-system standard — clear names, stable props, tested behavior, Storybook-ready when components land. If it looks like prototype trash, rewrite before commit.
 
 ---
 

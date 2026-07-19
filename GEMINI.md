@@ -1,0 +1,29 @@
+# Gemini & agent architecture notes
+
+> **CRITICAL:** Follow `AGENTS.md` first — especially the **repository hard boundary** (`dandrok/kitbash-ui` only) and branch-first PR rules.
+
+## What this repo is
+
+`@ktbsh/ui` — product design system authored with `@ktbsh/sdk`.
+
+- Author: `defineComponent` in `src/components/*.ts`
+- Build: `kitbash build` → `dist/vanilla`, `dist/react`, CEM
+- Themes/tokens: design spec; generation + drift check land in tokens PR
+- Storybook: later PR
+
+## Loop mode (summary)
+
+One coherent slice → branch → verify (`bun run verify`) → dual review → commit → PR to **master** (until renamed to `main`) → next task in `docs/TASKS.md`.
+
+Always: `gh … -R dandrok/kitbash-ui`. Never other repositories.
+
+## Pins
+
+- Bun **1.3.14** (CI + engines)
+- Biome **2.5.4**
+- `@ktbsh/sdk` **0.2.0** (uhtml owned by SDK)
+- Actions: full commit SHAs in `.github/workflows/ci.yml`
+
+## SDK footguns
+
+No outer closures in `render` / `events`. Prefer `commit` for user input. Semantic CSS vars + `part` hooks.
