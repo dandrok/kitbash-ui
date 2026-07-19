@@ -33,10 +33,10 @@ export default defineComponent({
     }
     input {
       appearance: auto;
-      width: 1.125rem;
-      height: 1.125rem;
-      min-width: 1.125rem;
-      min-height: 1.125rem;
+      width: 1.5rem;
+      height: 1.5rem;
+      min-width: 1.5rem;
+      min-height: 1.5rem;
       margin: 0;
       flex-shrink: 0;
       accent-color: var(--kb-color-accent-default);
@@ -73,6 +73,8 @@ export default defineComponent({
       const name = typeof props.name === 'string' ? props.name : '';
 
       if (target.checked && name && typeof document !== 'undefined') {
+        // Group only within the same form (or both formless), not document-wide
+        const formOwner = host.closest('form');
         const radios: HTMLElement[] = [];
         const walk = (root: ParentNode) => {
           root.querySelectorAll('kitbash-radio').forEach((el) => {
@@ -87,6 +89,8 @@ export default defineComponent({
 
         radios.forEach((el) => {
           if (el === host) return;
+          const otherForm = el.closest('form');
+          if (otherForm !== formOwner) return;
           const other = el as HTMLElement & {
             name?: string;
             checked?: boolean;

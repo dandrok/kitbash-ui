@@ -6,7 +6,7 @@
 >
 > **Security:** `@ktbsh/ui` must stay fully secure — no secrets in source, `dist/`, or Storybook. See `docs/security-and-secrets.md`.
 >
-> **⛔ NO COMMIT WITHOUT `agy`:** A second-LLM review via **`agy` (read-only)** is **mandatory before every commit**. Skipping is forbidden — even if CodeRabbit hangs, CI is green, or the change “looks small.”
+> **⛔ NO COMMIT WITHOUT dual review:** **CodeRabbit CLI (`cr`)** **and** **`agy` (gemini-3.1-pro-high, read-only)** are **both mandatory** before every commit. Skipping either is forbidden — even if CI is green or the change “looks small.”
 
 ---
 
@@ -104,8 +104,8 @@ Until rename lands, all agent/CI/`gh`/`cr` bases use **`master`**. After rename,
    git checkout -b <type>/<short-name>
    # types: feat | fix | chore | docs | ci | test
 
-3. Develop → verify → **`agy` read-only review** (required) → triage fixes → commit on the branch only
-   - **Never** `git commit` until `agy` has finished a pass on the pending changes.
+3. Develop → verify → **`cr review`** + **`agy` review** (both required) → triage fixes → commit on the branch only
+   - **Never** `git commit` until both reviewers have finished a pass on the pending changes.
 
 4. Push the branch and open a PR (this repo only)
    git push -u origin HEAD
@@ -123,29 +123,49 @@ Until rename lands, all agent/CI/`gh`/`cr` bases use **`master`**. After rename,
 | Keep the default branch matching `origin` | Leave local default ahead with private commits |
 | Use Path A: poll PR until merged, then next task | Stack unrelated work on one long-lived branch |
 | Keep `.env` local only; document vars in `.env.example` | Commit real tokens or put them in DS source |
-| Run **`agy` read-only before every commit** | Commit because “CI green” / “cr hung” / “docs only” without `agy` |
+| Run **`cr` + `agy` before every commit** | Skip CodeRabbit or agy because “CI green” / “docs only” / “takes too long” |
 
 If you already committed on the default branch by mistake: move commits to a feature branch, reset local default to `origin/<default>`, push the branch, open a PR. Never force-push the default branch unless the user explicitly requests it.
 
 ---
 
-## ⛔ Mandatory second pair of eyes: `agy` (before every commit)
+## ⛔ Mandatory dual review: CodeRabbit + `agy` (before every commit)
 
-This is as strict as the repository hard boundary.
+This is as strict as the repository hard boundary. **Two independent reviewers** before every commit:
+
+| Reviewer | Role |
+|----------|------|
+| **CodeRabbit CLI (`cr`)** | Diff-focused review (bugs, smells, a11y, consistency) |
+| **`agy` (`gemini-3.1-pro-high`)** | Second LLM, read-only plan mode |
 
 | Rule | Detail |
 |------|--------|
-| **When** | After local verify, **before** `git commit` — every time, every branch, every slice (code, docs, CI, nits) |
-| **Tool** | `agy` CLI — **read-only** review (must not edit the tree) |
-| **Not optional** | Do **not** skip if CodeRabbit fails/hangs, if the diff is “tiny”, or if you already self-reviewed |
-| **Order** | verify → local `cr` CLI if available (not the GitHub PR bot) → **`agy` (required)** → triage/fix → re-verify if fixed → **`agy` again if the fix was non-trivial** → only then commit |
-| **If `agy` fails to run** | **Do not commit.** Retry, fix the environment, or stop and tell the user. Never “commit anyway.” |
-| **Triage** | Fix real bugs and correctness nits; skip over-engineering that fights KISS |
+| **When** | After local verify, **before** `git commit` — every time |
+| **Not optional** | Do **not** skip either because the other passed, the diff is tiny, or CI is green |
+| **Order** | verify → **`cr review`** → **`agy`** → triage/fix → re-verify → re-run both if fixes were material → only then commit |
+| **If `cr` hangs or fails** | Retry with a longer wait / `cr doctor`. If still broken, **stop and tell the user** — do not silently drop CodeRabbit. (Do not treat hang as “optional skip.”) |
+| **If `agy` fails** | Same: retry or stop; never “commit anyway.” |
+| **Triage** | Fix real bugs, security, a11y, correctness nits; skip over-engineering that fights KISS/SDK serialization rules |
 
-### Required `agy` invocation (copy/paste)
+### Required CodeRabbit invocation
 
-**Model (mandatory):** `--model gemini-3.1-pro-high`  
-→ **Gemini 3.1 Pro (High)** — strongest 3.1 Pro tier; same pin as kitbash-sdk dual-review. Do **not** drop to Flash/Low for pre-commit review.
+```bash
+# From this repo only (dandrok/kitbash-ui). Base = current default branch.
+cr review --plain --base master
+# After rename: cr review --plain --base main
+# Agent-friendly output (optional):
+# cr review --agent --base master
+```
+
+Notes:
+
+- Local CLI review of the branch/uncommitted work — **not** a substitute for the GitHub PR bot (that can still run on the PR).
+- Use `--plain` for readable findings; triage like agy output.
+- Auth: `cr auth login` or API key (`cr doctor` should pass).
+
+### Required `agy` invocation
+
+**Model (mandatory):** `--model gemini-3.1-pro-high` (Gemini 3.1 Pro **High** — not Flash/Low).
 
 ```bash
 # From this repo only. Read-only. Do not edit files.
@@ -160,19 +180,17 @@ agy --model gemini-3.1-pro-high \
 Notes:
 
 - Prefer `--mode plan` (not accept-edits). Review must not silently rewrite the tree.
-- `--dangerously-skip-permissions` is only for headless tool access in review; still instruct **do not edit**.
-- `--print-timeout 15m` avoids false “timeout waiting for response” on larger diffs (default 5m is often too short).
-- If uncommitted is empty but the branch has unreviewed commits (process breach): run `agy` on `git diff master...HEAD`, fix, then commit the fixes — do not add more unreviewed work.
-- Optional heavier model (only if user asks): `claude-opus-4-6-thinking` or whatever `agy models` lists as Opus Thinking — default remains **`gemini-3.1-pro-high`**.
+- `--print-timeout 15m` avoids false timeouts on larger diffs.
 
 ### Forbidden rationalizations
 
-- “cr already ran” / “cr hung so I skipped dual review”
+- “agy is enough” / “cr is enough”
+- “cr hung last time so I always skip it”
 - “docs-only / config-only”
 - “user is waiting”
-- “I’ll run agy after the PR”
+- “I’ll let the GitHub PR bot catch it”
 
-**After commit is too late for the gate.** PR review tools are extra, not a substitute for pre-commit `agy`.
+**After commit is too late for the gate.** GitHub CodeRabbit on the PR is **extra**, not a replacement for pre-commit `cr` + `agy`.
 
 ---
 
@@ -189,12 +207,12 @@ Notes:
    - Include Storybook build when Storybook exists
 
 3. EXTERNAL REVIEW (before commit) — HARD GATE
-   - Optional local CodeRabbit CLI (not the post-push PR bot):
+   - **REQUIRED CodeRabbit:**
        cr review --plain --base master
-     (After rename: --base main). If `cr` hangs/fails, still run `agy` — never skip `agy`.
-   - **REQUIRED:** agy read-only review (command above)
-   - Triage: fix real bugs; skip over-engineering noise
-   - Re-run local verify (+ agy if fixes were material)
+     (After rename: --base main). If hung/failed: retry / cr doctor / tell user — do not skip.
+   - **REQUIRED agy:** (command above, gemini-3.1-pro-high)
+   - Triage both reports: fix real bugs; skip over-engineering noise
+   - Re-run local verify (+ cr + agy if fixes were material)
 
 4. COMMIT (on the feature branch only) — only after step 3 passes
    - Clear message: why + what
