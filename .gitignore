@@ -1,3 +1,7 @@
+# Storybook
+storybook-static/
+.storybook/public/
+
 # Logs
 logs
 *.log
