@@ -17,10 +17,10 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 - [x] Loading indicators — Spinner, Progress, Skeleton (PR #8)
 - [x] Forms polish — Field, Radio, Switch (PR #9)
 - [x] Navigation — Tabs, Breadcrumb, Nav, Pagination (PR #10; CR follow-up PR #12)
+- [x] Package exports / publish prep (PR #13)
 
 ## In progress / next
 
-- [ ] **Package exports / publish prep** — public entry points (`package.json` exports), pack dry-run (`feat/package-exports`)
 - [ ] **Default branch rename** `master` → `main` (GitHub setting + AGENTS/CI retarget)
 
 ## Standing requirements (every component PR)
@@ -29,6 +29,7 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 - **Tokens only** via semantic `--kb-*` (incl. radius/space/type — not colors only)
 - **Dual review** — `cr review` + `agy --model gemini-3.1-pro-high` before every commit
 - **Storybook stories** for new components
+- **SDK pain points** — append to [`docs/sdk-feedback.md`](./sdk-feedback.md) when blocked
 
 ## Planned waves (backlog)
 
@@ -37,7 +38,7 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 1. [x] **Loading** — Spinner, Progress, Skeleton  
 2. [x] **Forms polish** — Field, Radio, Switch  
 3. [x] **Navigation** — Tabs, Breadcrumb, Nav, Pagination (PR #10; CR follow-up PR #12)  
-4. [ ] **Package exports / publish prep** — public entry points (`package.json` exports), optional npm release CI  
+4. [x] **Package exports / publish prep** — public entry points (`package.json` exports), optional npm release CI (PR #13)  
 5. [ ] **Default branch rename** `master` → `main` (GitHub setting + AGENTS/CI retarget)
 
 ### Later / nice-to-have
@@ -53,17 +54,17 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 - [ ] Modal focus trap improvements (needs SDK lifecycle support)  
 - [ ] Token extras: gradients, motion/duration, z-index, opacity, density  
 - [ ] Storybook: richer token docs (already have color + space/radius/type scales)  
-- [ ] Automated axe in CI (Storybook test-runner)
+- [ ] Automated axe in CI (Storybook test-runner)  
+- [ ] **SDK improvements** — track consumer pain in [`docs/sdk-feedback.md`](./sdk-feedback.md)
 
 ## Known gaps (forms / inputs)
 
 | Area | Status |
 |------|--------|
-| `kitbash-input` `type` prop | Passed to native `<input>` — text-like types first-class; `date`/`file`/`color` work via browser chrome only (not specialized DS styling) |
+| `kitbash-input` `type` prop | Passed to native `<input>` — text-like first-class; date/file not specialized |
 | Number/date/file dedicated fields | Missing |
-| Field composite (label+error) | Missing |
-| Radio / Switch | Missing |
-| Checkbox form value when unchecked | SDK `setFormValue` limitation documented on checkbox |
+| Field / Radio / Switch | Shipped (PR #9) |
+| Checkbox form value when unchecked | **SDK limit** — see sdk-feedback.md P0 #2 |
 
 ## Tokens already shipped (not missing)
 
