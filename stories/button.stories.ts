@@ -4,29 +4,31 @@ import { html } from 'lit';
 import '../dist/vanilla/button.js';
 
 type ButtonArgs = {
-  variant: 'primary' | 'secondary';
+  variant: 'primary' | 'secondary' | 'ghost' | 'danger';
+  size: 'sm' | 'md' | 'lg';
   disabled: boolean;
   label: string;
 };
 
-/**
- * Scaffold button (`my-button`). Production tag `kitbash-button` lands in primitives PR.
- * Use Theme toolbar to verify light/dark tokens and focus ring contrast.
- */
 const meta = {
   title: 'Components/Button',
-  component: 'my-button',
+  component: 'kitbash-button',
   tags: ['autodocs'],
   argTypes: {
     variant: {
       control: 'select',
-      options: ['primary', 'secondary'],
+      options: ['primary', 'secondary', 'ghost', 'danger'],
+    },
+    size: {
+      control: 'select',
+      options: ['sm', 'md', 'lg'],
     },
     disabled: { control: 'boolean' },
     label: { control: 'text' },
   },
   args: {
     variant: 'primary',
+    size: 'md',
     disabled: false,
     label: 'Button',
   },
@@ -37,32 +39,32 @@ type Story = StoryObj<ButtonArgs>;
 
 export const Primary: Story = {
   render: (args) => html`
-    <my-button variant=${args.variant} ?disabled=${args.disabled}>
+    <kitbash-button
+      variant=${args.variant}
+      size=${args.size}
+      ?disabled=${args.disabled}
+    >
       ${args.label}
-    </my-button>
+    </kitbash-button>
   `,
 };
 
 export const Secondary: Story = {
-  args: {
-    variant: 'secondary',
-    label: 'Secondary',
-  },
-  render: (args) => html`
-    <my-button variant=${args.variant} ?disabled=${args.disabled}>
-      ${args.label}
-    </my-button>
-  `,
+  args: { variant: 'secondary', label: 'Secondary' },
+  render: Primary.render,
+};
+
+export const Ghost: Story = {
+  args: { variant: 'ghost', label: 'Ghost' },
+  render: Primary.render,
+};
+
+export const Danger: Story = {
+  args: { variant: 'danger', label: 'Delete' },
+  render: Primary.render,
 };
 
 export const Disabled: Story = {
-  args: {
-    disabled: true,
-    label: 'Disabled',
-  },
-  render: (args) => html`
-    <my-button variant=${args.variant} ?disabled=${args.disabled}>
-      ${args.label}
-    </my-button>
-  `,
+  args: { disabled: true, label: 'Disabled' },
+  render: Primary.render,
 };
