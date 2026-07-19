@@ -26,7 +26,8 @@ Development runs in **Path A autonomous loops**: implement one coherent slice �
 | Custom element prefix | `kitbash-*` |
 | Architecture | Single package, folder-layered (not a multi-package monorepo) |
 | Themes (v1) | Semantic tokens + **light** / **dark** CSS themes via `data-theme` |
-| Agent orchestration | Path A: local `docs/TASKS.md` queue + `gh` PR polling |
+| Agent orchestration | **Path A default:** local `docs/TASKS.md` + `gh` PR polling. **Path B optional later:** Actions + `todo-ai` issues + headless agent (see `docs/security-and-secrets.md`). Local `.env` ≠ Actions secrets. |
+| Security | No secrets in package/source; gitignored `.env`; least-privilege tokens; DS XSS/supply-chain bar |
 | First component wave | Button, Input, Textarea, Checkbox, Select, Label, Link, Badge |
 | Lint/format | Biome (aligned with kitbash-sdk) |
 | Runtime | Bun ≥ 1.0 |

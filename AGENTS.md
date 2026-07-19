@@ -3,6 +3,36 @@
 > Also read `GEMINI.md` (when present) and the design spec under `docs/superpowers/specs/` before large changes.
 >
 > **Mode:** **Loop mode** — one coherent slice per branch/PR, dual review, then merge.
+>
+> **Security:** `@ktbsh/ui` must stay fully secure — no secrets in source, `dist/`, or Storybook. See `docs/security-and-secrets.md`.
+
+---
+
+## Security (mandatory)
+
+| Rule | Detail |
+|------|--------|
+| No secrets in git | `.env` / `.env.*` gitignored; only `.env.example` committed |
+| No secrets in the DS | Components and published builds never embed API keys or tokens |
+| Local secrets | Copy `.env.example` → `.env` (Path A). Guide: `docs/security-and-secrets.md` |
+| CI secrets | Path B uses **GitHub Actions secrets**, not the local `.env` file |
+| Least privilege | Fine-grained PAT scoped to this repo; prefer `gh auth login` locally |
+
+If a secret is ever committed: rotate it immediately, purge from history if needed, and treat the leak as an incident.
+
+---
+
+## Agent loop: Path A (default) vs Path B (optional later)
+
+| | **Path A — local (default)** | **Path B — GitHub Actions factory** |
+|--|------------------------------|-------------------------------------|
+| Where agent runs | Your machine / this CLI | `ubuntu-latest` runner |
+| Task queue | `docs/TASKS.md` | Issues labeled `todo-ai` |
+| Secrets | Local `.env` + `gh auth` | Repo Actions secrets (`AGENT_GITHUB_TOKEN`, AI key) |
+| Trigger | After PR merge, poll + next task | `pull_request` closed + `merged` |
+| Reality check | This session *is* the agent | Needs a **headless** CLI in CI — not this interactive TUI by default |
+
+**Do not enable full Path B autonomy until:** a non-interactive agent entrypoint exists, concurrency/budget guards exist, and secrets are in GitHub (not only `.env`). Normal **CI** (lint/typecheck/build) is separate and should land early.
 
 ---
 
@@ -34,6 +64,7 @@
 | One PR per coherent slice (including design specs) | Land docs/specs only on the default branch |
 | Keep the default branch matching `origin` | Leave local `main` ahead with private commits |
 | Use Path A: poll PR until merged, then next task | Stack unrelated work on one long-lived branch |
+| Keep `.env` local only; document vars in `.env.example` | Commit real tokens or put them in DS source |
 
 If you already committed on the default branch by mistake: move commits to a feature branch, reset local `main` to `origin/main`, push the branch, open a PR. Never force-push `main` unless the user explicitly requests it.
 
@@ -94,7 +125,8 @@ If you already committed on the default branch by mistake: move commits to a fea
 |---------|------|
 | README | Install, scripts, consume |
 | Storybook | Component API playground |
-| AGENTS.md | Agent loop, git/PR rules, pins |
+| AGENTS.md | Agent loop, git/PR rules, pins, security pointers |
+| docs/security-and-secrets.md | Tokens, Path A/B secrets, DS security bar |
 | docs/TASKS.md | Ordered implementation queue |
 | docs/superpowers/specs/ | Design decisions |
 
