@@ -4,6 +4,12 @@ import '../src/tokens/themes/light.css';
 import '../src/tokens/themes/dark.css';
 import '../src/tokens/themes/terminal/light.css';
 import '../src/tokens/themes/terminal/dark.css';
+import {
+  applyPreset,
+  applyTheme,
+  type KitbashPreset,
+  type KitbashTheme,
+} from '../src/tokens/semantic.ts';
 
 const preview: Preview = {
   parameters: {
@@ -52,15 +58,13 @@ const preview: Preview = {
   },
   decorators: [
     (story, context) => {
-      const theme = (context.globals.theme as string) || 'light';
-      const preset = (context.globals.preset as string) || 'default';
+      const theme = ((context.globals.theme as string) ||
+        'light') as KitbashTheme;
+      const preset = ((context.globals.preset as string) ||
+        'default') as KitbashPreset;
       if (typeof document !== 'undefined') {
-        document.documentElement.dataset.theme = theme;
-        if (preset === 'terminal') {
-          document.documentElement.dataset.kbPreset = 'terminal';
-        } else {
-          delete document.documentElement.dataset.kbPreset;
-        }
+        applyTheme(theme === 'dark' ? 'dark' : 'light');
+        applyPreset(preset === 'terminal' ? 'terminal' : 'default');
         // Canvas follows semantic tokens (theme + preset)
         document.body.style.background = 'var(--kb-color-bg-canvas)';
         document.body.style.color = 'var(--kb-color-fg-default)';

@@ -81,15 +81,16 @@ function expectedArtifacts(): Record<string, string> {
       'dark',
       ':root[data-theme="dark"]',
     ),
+    // Unconditioned terminal preset falls back to light (matches getTheme() + base :root).
     [TERMINAL_LIGHT_CSS]: renderThemeCss(
       terminalTokens as TokenMap,
       'light',
-      ':root[data-kb-preset="terminal"][data-theme="light"]',
+      ':root[data-kb-preset="terminal"],\n:root[data-kb-preset="terminal"][data-theme="light"]',
     ),
     [TERMINAL_DARK_CSS]: renderThemeCss(
       terminalTokens as TokenMap,
       'dark',
-      ':root[data-kb-preset="terminal"],\n:root[data-kb-preset="terminal"][data-theme="dark"]',
+      ':root[data-kb-preset="terminal"][data-theme="dark"]',
     ),
     [TOKENS_JSON]: renderTokensJson(),
   };

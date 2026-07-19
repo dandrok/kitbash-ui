@@ -3,6 +3,7 @@
  * Source: src/tokens/semantic.ts (+ presets)
  * Regenerate: bun run tokens:build
  */
+:root[data-kb-preset="terminal"],
 :root[data-kb-preset="terminal"][data-theme="light"] {
   --kb-color-bg-canvas: #f8f9fa;
   --kb-color-bg-surface: #ffffff;
