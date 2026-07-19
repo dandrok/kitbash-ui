@@ -28,6 +28,7 @@ Development runs in **Path A autonomous loops**: implement one coherent slice �
 | Themes (v1) | Semantic tokens + **light** / **dark** CSS themes via `data-theme` |
 | Agent orchestration | **Path A default:** local `docs/TASKS.md` + `gh` PR polling. **Path B optional later:** Actions + `todo-ai` issues + headless agent (see `docs/security-and-secrets.md`). Local `.env` ≠ Actions secrets. |
 | Security | No secrets in package/source; gitignored `.env`; least-privilege tokens; DS XSS/supply-chain bar |
+| Accessibility | **WCAG 2.2 AA** from first component ship; keyboard, focus, name/state, contrast light+dark; see `docs/a11y.md` |
 | First component wave | Button, Input, Textarea, Checkbox, Select, Label, Link, Badge |
 | Lint/format | Biome (aligned with kitbash-sdk); pin exact version in `package.json` + lockfile |
 | Runtime | **Bun 1.3.14** in CI/`engines` (aligned with kitbash-sdk). Reproducible via `bun.lock`. See §2.1. |
@@ -252,7 +253,7 @@ Do **not** paste full prop tables into both README and Storybook.
 | Forms | `formAssociated` + `delegatesFocus` for text-like controls |
 | Events | User input → `commit`; consumers use `kitbash-change` / `onKitbashChange` |
 | Slots | Default slot for content; named slots only when justified |
-| A11y | Correct roles, labeling (Label component / aria props), focus ring, disabled |
+| A11y | **WCAG 2.2 AA** gate — native controls preferred; APG when needed; focus-visible; delegatesFocus; contrast; target size; see `docs/a11y.md` |
 
 **Scaffold cleanup (primitives PR):** rename `my-button` → `kitbash-button`; remove demo click-count from default Button API; align Input with production tokens and Label composition.
 
@@ -279,8 +280,8 @@ Expand carefully as components need; keep types co-located under `src/types/` an
 |----|-------|--------|
 | **1** | Foundation | Package rename `@ktbsh/ui`, Biome, tsconfig, scripts, GEMINI.md, `docs/TASKS.md`, CI on **current default (`master`)**, Bun **1.3.14**, README refresh. **Include or immediately follow with** `master`→`main` rename meeting §2.2 exit criteria. **No** full tokens/Storybook/new components. Keep existing button/input building. |
 | **2** | Tokens & themes | Semantic tokens, light/dark CSS (`:root` light fallback), typed exports, **generated** `tokens.json` + `tokens:build` / `tokens:check` |
-| **3** | Storybook | Storybook WC setup, theme toolbar, foundation MDX, CI storybook build |
-| **4** | Primitives wave | Button, Input, Textarea, Checkbox, Select, Label, Link, Badge (+ tests + stories) |
+| **3** | Storybook | Storybook WC setup, theme toolbar, foundation MDX, **a11y addon**, CI storybook build |
+| **4** | Primitives wave | Button, Input, Textarea, Checkbox, Select, Label, Link, Badge (+ tests + stories + **WCAG 2.2 AA checklist** / `docs/a11y.md`) |
 | **5+** | Later waves | Layout (Box/Stack/Container/Text/Heading), feedback (Alert/Toast), overlays (Modal), nav — split by coherence, not one mega-PR |
 
 ### PR1 detailed in-scope

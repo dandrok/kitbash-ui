@@ -10,7 +10,8 @@ Author once → vanilla custom elements + React wrappers + Custom Elements Manif
 | **Runtime** | Bun ≥ 1.3.14 |
 
 Component playground and full prop docs will live in **Storybook** (not yet).  
-Agent/process rules: [`AGENTS.md`](./AGENTS.md). Architecture: [`docs/superpowers/specs/`](./docs/superpowers/specs/).
+Agent/process rules: [`AGENTS.md`](./AGENTS.md). Architecture: [`docs/superpowers/specs/`](./docs/superpowers/specs/).  
+Accessibility target: **WCAG 2.2 AA** — [`docs/a11y.md`](./docs/a11y.md).
 
 ## Requirements
 

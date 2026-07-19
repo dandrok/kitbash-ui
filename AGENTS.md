@@ -14,8 +14,8 @@
 
 **Allowed repository (only):**
 
-| | |
-|--|--|
+| Scope | Target / path |
+|-------|----------------|
 | **Local path** | `/home/dandrok/git/kitbash-ui` (this workspace) |
 | **GitHub** | `dandrok/kitbash-ui` only (`https://github.com/dandrok/kitbash-ui`) |
 
@@ -209,7 +209,7 @@ Notes:
 
 ---
 
-## Craftsmanship (no rush, no trash, no security holes)
+## Craftsmanship (no rush, no trash, no security holes, a11y from day one)
 
 **Speed never beats correctness.** Take the time the change needs. Prefer one solid slice over a sloppy pile of files.
 
@@ -218,7 +218,8 @@ Notes:
 | Read surrounding code and the design spec before editing | Drive-by “while I’m here” refactors |
 | KISS / DRY — smallest clear design that works | Clever abstractions, copy-paste twins, dead code |
 | Strong TypeScript types for public APIs and component props | `any`, silent casts, undocumented stringly APIs |
-| Semantic tokens, a11y basics, focus/disabled/invalid states | Hard-coded one-off styles or insecure HTML injection |
+| Semantic tokens + **WCAG-minded** color/focus/disabled/invalid | Hard-coded one-off styles or insecure HTML injection |
+| **A11y built in on first ship** of each component (see below) | “We’ll add ARIA later” / mouse-only widgets |
 | Verify fully, then **`agy --model gemini-3.1-pro-high`**, then commit | Rush commits, skip review, “fix later” |
 | Secrets never in source, `dist/`, Storybook, or logs | Tokens in env committed to git, XSS via untrusted HTML |
 
@@ -230,6 +231,24 @@ Notes:
 - Destructive git only with explicit user ask for **this** repo.
 
 **Code quality bar for `@ktbsh/ui`:** professional design-system standard — clear names, stable props, tested behavior, Storybook-ready when components land. If it looks like prototype trash, rewrite before commit.
+
+### Accessibility (mandatory — WCAG 2.2 AA)
+
+Full checklist: **`docs/a11y.md`**. Summary for every component PR:
+
+| Gate | Requirement |
+|------|-------------|
+| **Target** | **WCAG 2.2 Level AA** for interactive components |
+| **Patterns** | Prefer native controls; else APG-aligned roles/keyboard |
+| **Keyboard** | Fully usable without a pointer |
+| **Focus** | Visible `:focus-visible` (tokenized); `delegatesFocus` when appropriate |
+| **Name / state** | Accessible name; disabled/invalid/expanded/etc. exposed to AT |
+| **Contrast** | Text/UI against backgrounds meets AA in **light and dark** |
+| **Target size** | Aim ≥ 24×24 CSS px (WCAG 2.2 target size) where applicable |
+| **Motion** | Honor `prefers-reduced-motion` when animations exist |
+| **Tests** | Behavior tests for a11y-critical props; Storybook a11y when available |
+
+**Do not merge** a component that is pointer-only, missing focus styles, or unlabeled for assistive tech. Consumer apps own product copy; this library owns roles, keyboard, focus, and state (not the SDK compiler alone).
 
 ---
 
@@ -269,8 +288,9 @@ Edit `semantic.ts` only, then `tokens:build`. Do not hand-patch generated CSS/JS
 | Surface | Owns |
 |---------|------|
 | README | Install, scripts, consume |
-| Storybook | Component API playground |
-| AGENTS.md | Agent loop, git/PR rules, pins, security pointers |
+| Storybook | Component API playground + a11y notes |
+| AGENTS.md | Agent loop, git/PR rules, pins, security, a11y gates |
+| docs/a11y.md | WCAG 2.2 AA target, component checklist, testing |
 | docs/security-and-secrets.md | Tokens, Path A/B secrets, DS security bar |
 | docs/TASKS.md | Ordered implementation queue |
 | docs/superpowers/specs/ | Design decisions |

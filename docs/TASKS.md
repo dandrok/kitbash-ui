@@ -14,11 +14,17 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 
 - [ ] **Tokens & themes** — semantic TS, light/dark CSS (`:root` light fallback), generated `tokens.json`, `tokens:build` / `tokens:check` (`feat/tokens-themes`)
 
+## Standing requirements (every component PR)
+
+- **A11y / WCAG 2.2 AA** from first ship — see `docs/a11y.md` and `AGENTS.md` (keyboard, focus, name/state, contrast, target size).
+- **Tokens only** via semantic `--kb-*` (no one-off inaccessible colors).
+- **agy** pre-commit (`gemini-3.1-pro-high`) + branch/PR workflow.
+
 ## Backlog
 
 - [ ] **Default branch rename** `master` → `main` (GitHub setting + AGENTS/CI retarget) — exit criteria in design spec §2.2
-- [ ] **Storybook** — WC stories, theme toolbar, foundation MDX, CI `build-storybook`
-- [ ] **Primitives wave** — Button, Input, Textarea, Checkbox, Select, Label, Link, Badge (+ tests + stories)
+- [ ] **Storybook** — WC stories, theme toolbar, foundation MDX, **a11y addon**, CI `build-storybook`
+- [ ] **Primitives wave** — Button, Input, Textarea, Checkbox, Select, Label, Link, Badge (+ tests + stories + **a11y checklist**)
 - [ ] **Layout wave** — Box, Stack, Container, Text, Heading (split if large)
 - [ ] **Feedback / overlay** — Alert, Toast, Modal
 - [ ] **Navigation** — as needed for full page kits
