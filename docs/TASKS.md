@@ -21,7 +21,8 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 
 ## In progress / next
 
-- [ ] **Default branch rename** `master` → `main` (GitHub setting + AGENTS/CI retarget)
+- [ ] **npm first release** — tag `v0.1.0` after publish workflow lands (secret `NPM_TOKEN`)
+- [ ] ~~Default branch rename `master` → `main`~~ — optional; skip unless desired
 
 ## Standing requirements (every component PR)
 

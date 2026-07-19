@@ -124,13 +124,20 @@ Local: `.env`. Path B: GitHub Actions secret with the **same name**.
 | CodeRabbit CLI | per their docs | Local / their cloud |
 | Other LLM review | provider key | Local `.env` only unless you run review in CI |
 
-### 4. npm publish (later, not needed for DS build)
+### 4. npm publish (`@ktbsh/ui`)
 
 | Secret | Where |
 |--------|--------|
-| `NPM_TOKEN` | npmjs.com → Access tokens (Automation) → GitHub Actions secret |
+| `NPM_TOKEN` | npmjs.com → **Granular** access token → GitHub Actions secret on `dandrok/kitbash-ui` |
 
-Not required until a release workflow exists.
+**Token shape (recommended):**
+
+- Packages and scopes: **only** `@ktbsh` → **Read and write**
+- Organizations: **only** `ktbsh` → **Read and write**
+- Enable **Bypass 2FA** if the token is used from CI
+
+**When it runs:** `.github/workflows/publish.yml` on push of tags `v*` (e.g. `v0.1.0`).  
+Tag name without `v` **must** equal `package.json` `"version"`. Merges to `master` do **not** publish.
 
 ---
 
