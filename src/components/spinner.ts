@@ -2,8 +2,8 @@ import { defineComponent } from '@ktbsh/sdk';
 
 /**
  * Indeterminate loading indicator.
- * A11y: `role="status"` + accessible name; animation reduced under
- * `prefers-reduced-motion`.
+ * A11y: `role="status"` with visually hidden text (more reliable than
+ * empty + aria-label alone). Animation reduced under prefers-reduced-motion.
  */
 export default defineComponent({
   tag: 'kitbash-spinner',
@@ -18,6 +18,7 @@ export default defineComponent({
       justify-content: center;
       color: var(--kb-color-accent-default);
       vertical-align: middle;
+      position: relative;
     }
     .root {
       display: inline-block;
@@ -54,6 +55,17 @@ export default defineComponent({
         opacity: 0.7;
       }
     }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
   `,
   render({ props, html }) {
     const size = props.size === 'sm' || props.size === 'lg' ? props.size : 'md';
@@ -63,12 +75,9 @@ export default defineComponent({
         : 'Loading';
 
     return html`
-      <span
-        part="spinner-root"
-        class=${`root ${size}`}
-        role="status"
-        aria-label=${label}
-      ></span>
+      <span part="spinner-root" class=${`root ${size}`} role="status">
+        <span class="sr-only">${label}</span>
+      </span>
     `;
   },
 });
