@@ -48,6 +48,10 @@ export default defineComponent({
     ::slotted(a:hover) {
       background: var(--kb-color-bg-subtle);
     }
+    ::slotted(a:focus-visible) {
+      outline: none;
+      box-shadow: var(--kb-focus-ring);
+    }
     ::slotted(a[aria-current="page"]) {
       color: var(--kb-color-accent-default);
       background: var(--kb-color-accent-subtle);
