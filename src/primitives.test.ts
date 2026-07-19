@@ -16,6 +16,11 @@ describe('primitive components', () => {
       'select.ts',
       'link.ts',
       'badge.ts',
+      'box.ts',
+      'stack.ts',
+      'container.ts',
+      'text.ts',
+      'heading.ts',
     ]) {
       expect(files.includes(name), name).toBe(true);
     }

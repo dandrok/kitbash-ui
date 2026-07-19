@@ -11,10 +11,11 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 - [x] Foundation tooling — `@ktbsh/ui`, Biome, TypeScript, CI, GEMINI, README (PR #2)
 - [x] Tokens & themes + a11y policy (PR #3)
 - [x] Storybook — WC, theme toolbar, a11y addon (PR #4)
+- [x] Primitives wave — Button through Badge (PR #5)
 
 ## In progress / next
 
-- [ ] **Primitives wave** — Button, Input, Textarea, Checkbox, Select, Label, Link, Badge (`feat/primitives`)
+- [ ] **Layout wave** — Box, Stack, Container, Text, Heading (`feat/layout`)
 
 ## Standing requirements (every component PR)
 
@@ -26,7 +27,6 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 ## Backlog
 
 - [ ] **Default branch rename** `master` → `main` (GitHub setting + AGENTS/CI retarget) — exit criteria in design spec §2.2
-- [ ] **Layout wave** — Box, Stack, Container, Text, Heading (split if large)
 - [ ] **Feedback / overlay** — Alert, Toast, Modal
 - [ ] **Navigation** — as needed for full page kits
 - [ ] **Package exports / publish prep** — public entry points, optional npm release workflow
