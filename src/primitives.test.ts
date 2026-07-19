@@ -21,6 +21,9 @@ describe('primitive components', () => {
       'container.ts',
       'text.ts',
       'heading.ts',
+      'alert.ts',
+      'toast.ts',
+      'modal.ts',
     ]) {
       expect(files.includes(name), name).toBe(true);
     }
