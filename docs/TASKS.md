@@ -21,7 +21,8 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 
 ## In progress / next
 
-- [ ] **npm first release** — tag `v0.1.0` after publish workflow lands (secret `NPM_TOKEN`)
+- [ ] **Theme presets (astro-blog-md)** — terminal + default light/dark; see `docs/consumer-astro-blog-md.md` (`feat/theme-presets-blog`)
+- [x] **npm first release** — publish workflow + operator release
 - [ ] ~~Default branch rename `master` → `main`~~ — optional; skip unless desired
 
 ## Standing requirements (every component PR)

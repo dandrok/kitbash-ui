@@ -49,8 +49,10 @@ dist/
 | `@ktbsh/ui` | Tokens helpers + shared types |
 | `@ktbsh/ui/vanilla/<name>` | Register `kitbash-<name>` custom element |
 | `@ktbsh/ui/react/<name>` | React wrapper (`Kitbash*`) + types |
-| `@ktbsh/ui/themes/light.css` | Light theme (`:root` default) |
-| `@ktbsh/ui/themes/dark.css` | Dark theme (`:root[data-theme="dark"]`) |
+| `@ktbsh/ui/themes/light.css` | Default preset light (`:root` default) |
+| `@ktbsh/ui/themes/dark.css` | Default preset dark (`:root[data-theme="dark"]`) |
+| `@ktbsh/ui/themes/terminal/light.css` | Terminal preset light |
+| `@ktbsh/ui/themes/terminal/dark.css` | Terminal preset dark (Matrix night) |
 | `@ktbsh/ui/tokens` | Token API only |
 | `@ktbsh/ui/types` | Shared TypeScript unions |
 | `@ktbsh/ui/custom-elements.json` | Custom Elements Manifest |
@@ -87,13 +89,20 @@ Load theme CSS in the host app (variables inherit into shadow roots):
 ```ts
 import '@ktbsh/ui/themes/light.css';
 import '@ktbsh/ui/themes/dark.css';
-import { applyTheme } from '@ktbsh/ui';
+// Optional Matrix-style preset (blog terminal mode):
+import '@ktbsh/ui/themes/terminal/light.css';
+import '@ktbsh/ui/themes/terminal/dark.css';
+import { applyPreset, applyTheme } from '@ktbsh/ui';
 
-applyTheme('dark'); // document.documentElement dataset.theme
-// light is default via :root even without data-theme
+applyTheme('dark'); // data-theme — light | dark (night)
+applyPreset('terminal'); // data-kb-preset — default | terminal
+// light + default when attributes omitted
 ```
 
-Components use semantic vars such as `var(--kb-color-accent-default)`. Kitbash also injects light defaults onto `:host` from `tokens.json`.
+Two axes (same idea as the personal blog): **theme** (light/dark) × **preset** (default/terminal).  
+Components use only semantic vars such as `var(--kb-color-accent-default)`, **inherited from document** theme CSS.
+
+> **Required:** load theme stylesheets on the app shell (`:root`). We do **not** bake absolute token values onto each component `:host` — that sealed the shadow tree and blocked theme toggles (see `docs/sdk-feedback.md` P0 #0).
 
 ## Consume
 
