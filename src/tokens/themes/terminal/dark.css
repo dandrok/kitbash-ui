@@ -1,0 +1,53 @@
+/**
+ * GENERATED FILE — do not edit by hand.
+ * Source: src/tokens/semantic.ts (+ presets)
+ * Regenerate: bun run tokens:build
+ */
+:root[data-kb-preset="terminal"],
+:root[data-kb-preset="terminal"][data-theme="dark"] {
+  --kb-color-bg-canvas: #050a05;
+  --kb-color-bg-surface: #0a120a;
+  --kb-color-bg-subtle: #0f1a0f;
+  --kb-color-bg-inverse: #d1fae5;
+  --kb-color-fg-default: #4ade80;
+  --kb-color-fg-muted: #a3f2b0;
+  --kb-color-fg-subtle: #00cc33;
+  --kb-color-fg-on-accent: #050a05;
+  --kb-color-fg-on-inverse: #050a05;
+  --kb-color-border-default: #00e637;
+  --kb-color-border-muted: #00b42d;
+  --kb-color-border-focus: #00ff41;
+  --kb-color-accent-default: #00ff41;
+  --kb-color-accent-hover: #00e637;
+  --kb-color-accent-subtle: rgba(74, 222, 128, 0.1);
+  --kb-color-danger-default: #f85149;
+  --kb-color-danger-subtle: #2d1214;
+  --kb-color-success-default: #4ade80;
+  --kb-color-success-subtle: #12261e;
+  --kb-color-warning-default: #d29922;
+  --kb-color-warning-subtle: #2a2111;
+  --kb-space-2xs: 2px;
+  --kb-space-xs: 4px;
+  --kb-space-sm: 8px;
+  --kb-space-md: 16px;
+  --kb-space-lg: 24px;
+  --kb-space-xl: 32px;
+  --kb-space-2xl: 48px;
+  --kb-radius-sm: 2px;
+  --kb-radius-md: 4px;
+  --kb-radius-lg: 6px;
+  --kb-radius-full: 9999px;
+  --kb-font-family-sans: 'VT323', ui-monospace, 'Courier New', monospace;
+  --kb-font-size-sm: 0.875rem;
+  --kb-font-size-md: 1rem;
+  --kb-font-size-lg: 1.125rem;
+  --kb-font-size-xl: 1.25rem;
+  --kb-font-weight-regular: 400;
+  --kb-font-weight-medium: 500;
+  --kb-font-weight-semibold: 600;
+  --kb-line-height-tight: 1.25;
+  --kb-line-height-normal: 1.625;
+  --kb-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.5);
+  --kb-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.55);
+  --kb-focus-ring: 0 0 0 3px rgba(0, 255, 65, 0.35);
+}

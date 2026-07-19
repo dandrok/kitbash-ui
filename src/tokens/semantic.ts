@@ -1,11 +1,25 @@
 /**
- * Design tokens — single source of truth for names and light/dark values.
- * CSS themes + kitbash `tokens.json` are generated from this module.
+ * Design tokens — single source of truth for names and **default** light/dark values.
+ * CSS themes + kitbash `tokens.json` are generated from this module + presets.
  *
  * CSS custom property for key `color-bg-canvas` → `--kb-color-bg-canvas`
+ *
+ * **Presets** (UI chrome / brand pack), orthogonal to light/dark:
+ * - `default` — neutral/blue DS (no `data-kb-preset` or `data-kb-preset="default"`)
+ * - `terminal` — Matrix-style pack from consumer blog (`data-kb-preset="terminal"`)
+ *
+ * See `docs/consumer-astro-blog-md.md`.
  */
 
+/** Color scheme axis (night = dark). */
 export type KitbashTheme = 'light' | 'dark';
+
+/**
+ * Brand / UI-mode axis. Maps to blog `data-ui-mode`:
+ * - default ≈ regular
+ * - terminal ≈ terminal
+ */
+export type KitbashPreset = 'default' | 'terminal';
 
 export type TokenValue = {
   readonly light: string;
@@ -106,14 +120,19 @@ export function cssVar(token: SemanticTokenName): string {
   return `var(${cssVarName(token)})`;
 }
 
+function resolveRoot(root?: HTMLElement): HTMLElement | undefined {
+  return (
+    root ??
+    (typeof document !== 'undefined' ? document.documentElement : undefined)
+  );
+}
+
 /**
- * Apply theme on an element (default: document root in browsers).
+ * Apply color scheme on an element (default: document root in browsers).
  * No-op without a DOM root (SSR) unless `root` is passed explicitly.
  */
 export function applyTheme(theme: KitbashTheme, root?: HTMLElement): void {
-  const el =
-    root ??
-    (typeof document !== 'undefined' ? document.documentElement : undefined);
+  const el = resolveRoot(root);
   if (el) {
     el.dataset.theme = theme;
   }
@@ -121,8 +140,26 @@ export function applyTheme(theme: KitbashTheme, root?: HTMLElement): void {
 
 /** Defaults to `light` when no DOM / no data-theme (SSR-safe). */
 export function getTheme(root?: HTMLElement): KitbashTheme {
-  const el =
-    root ??
-    (typeof document !== 'undefined' ? document.documentElement : undefined);
+  const el = resolveRoot(root);
   return el?.dataset.theme === 'dark' ? 'dark' : 'light';
+}
+
+/**
+ * Apply brand preset (`data-kb-preset`). Omit/`default` uses base theme CSS only.
+ * Load matching CSS: `@ktbsh/ui/themes/terminal/light.css` + `dark.css` for terminal.
+ */
+export function applyPreset(preset: KitbashPreset, root?: HTMLElement): void {
+  const el = resolveRoot(root);
+  if (!el) return;
+  if (preset === 'default') {
+    delete el.dataset.kbPreset;
+  } else {
+    el.dataset.kbPreset = preset;
+  }
+}
+
+/** Defaults to `default` when unset (SSR-safe). */
+export function getPreset(root?: HTMLElement): KitbashPreset {
+  const el = resolveRoot(root);
+  return el?.dataset.kbPreset === 'terminal' ? 'terminal' : 'default';
 }

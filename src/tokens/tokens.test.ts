@@ -1,8 +1,11 @@
 import { describe, expect, test } from 'bun:test';
+import { terminalTokens } from './presets/terminal.ts';
 import {
+  applyPreset,
   applyTheme,
   cssVar,
   cssVarName,
+  getPreset,
   getTheme,
   semanticTokens,
 } from './semantic.ts';
@@ -10,6 +13,18 @@ import {
 describe('semantic tokens', () => {
   test('every token has light and dark string values', () => {
     for (const [name, value] of Object.entries(semanticTokens)) {
+      expect(typeof value.light, name).toBe('string');
+      expect(typeof value.dark, name).toBe('string');
+      expect(value.light.length, name).toBeGreaterThan(0);
+      expect(value.dark.length, name).toBeGreaterThan(0);
+    }
+  });
+
+  test('terminal preset keys match default semantic tokens', () => {
+    const base = Object.keys(semanticTokens).sort();
+    const term = Object.keys(terminalTokens).sort();
+    expect(term).toEqual(base);
+    for (const [name, value] of Object.entries(terminalTokens)) {
       expect(typeof value.light, name).toBe('string');
       expect(typeof value.dark, name).toBe('string');
       expect(value.light.length, name).toBeGreaterThan(0);
@@ -35,5 +50,16 @@ describe('semantic tokens', () => {
   test('getTheme defaults to light when data-theme is absent', () => {
     const el = { dataset: {} as DOMStringMap } as HTMLElement;
     expect(getTheme(el)).toBe('light');
+  });
+
+  test('applyPreset / getPreset round-trip', () => {
+    const el = { dataset: {} as DOMStringMap } as HTMLElement;
+    expect(getPreset(el)).toBe('default');
+    applyPreset('terminal', el);
+    expect(getPreset(el)).toBe('terminal');
+    expect(el.dataset.kbPreset).toBe('terminal');
+    applyPreset('default', el);
+    expect(getPreset(el)).toBe('default');
+    expect(el.dataset.kbPreset).toBeUndefined();
   });
 });

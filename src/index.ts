@@ -8,13 +8,20 @@
  * Theme CSS (load once in the app shell):
  *   import '@ktbsh/ui/themes/light.css'
  *   import '@ktbsh/ui/themes/dark.css'
+ *   import '@ktbsh/ui/themes/terminal/light.css' // optional
+ *   import '@ktbsh/ui/themes/terminal/dark.css'
+ *
+ * applyTheme('light'|'dark'); applyPreset('default'|'terminal');
  */
 
 export {
+  applyPreset,
   applyTheme,
   cssVar,
   cssVarName,
+  getPreset,
   getTheme,
+  type KitbashPreset,
   type KitbashTheme,
   type SemanticTokenName,
   semanticTokens,

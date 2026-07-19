@@ -35,11 +35,9 @@ function runTscPackage(): void {
 }
 
 function copyThemes(): void {
+  // Recursive: default light/dark + presets (e.g. themes/terminal/*.css)
   mkdirSync(themesOut, { recursive: true });
-  for (const file of readdirSync(themesIn)) {
-    if (!file.endsWith('.css')) continue;
-    cpSync(join(themesIn, file), join(themesOut, file));
-  }
+  cpSync(themesIn, themesOut, { recursive: true });
 }
 
 /** Side-effect CE modules: no runtime exports, but TS needs a declaration. */
@@ -70,6 +68,8 @@ function assertOutputs(): void {
     'types/index.d.ts',
     'themes/light.css',
     'themes/dark.css',
+    'themes/terminal/light.css',
+    'themes/terminal/dark.css',
     'vanilla/button.js',
     'vanilla/button.d.ts',
     'react/button.js',
