@@ -6,7 +6,7 @@ Author once → vanilla custom elements + React wrappers + Custom Elements Manif
 | | |
 |--|--|
 | **Package** | `@ktbsh/ui` |
-| **Tags** | `kitbash-*` (button, input, label, textarea, checkbox, select, link, badge) |
+| **Tags** | `kitbash-*` primitives + layout (box, stack, container, text, heading, …) |
 | **Runtime** | Bun ≥ 1.3.14 |
 
 Component playground and full prop docs will live in **Storybook** (not yet).  
