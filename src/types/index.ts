@@ -45,3 +45,5 @@ export type KitbashTextTone =
 export type KitbashHeadingLevel = '1' | '2' | '3' | '4' | '5' | '6';
 
 export type KitbashContainerWidth = 'sm' | 'md' | 'lg' | 'xl' | 'full';
+
+export type KitbashFeedbackTone = 'info' | 'success' | 'warning' | 'danger';

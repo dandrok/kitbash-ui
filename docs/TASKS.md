@@ -12,10 +12,11 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 - [x] Tokens & themes + a11y policy (PR #3)
 - [x] Storybook — WC, theme toolbar, a11y addon (PR #4)
 - [x] Primitives wave — Button through Badge (PR #5)
+- [x] Layout wave — Box, Stack, Container, Text, Heading (PR #6)
 
 ## In progress / next
 
-- [ ] **Layout wave** — Box, Stack, Container, Text, Heading (`feat/layout`)
+- [ ] **Feedback / overlay** — Alert, Toast, Modal (`feat/feedback-overlay`)
 
 ## Standing requirements (every component PR)
 
@@ -27,7 +28,6 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 ## Backlog
 
 - [ ] **Default branch rename** `master` → `main` (GitHub setting + AGENTS/CI retarget) — exit criteria in design spec §2.2
-- [ ] **Feedback / overlay** — Alert, Toast, Modal
 - [ ] **Navigation** — as needed for full page kits
 - [ ] **Package exports / publish prep** — public entry points, optional npm release workflow
 
