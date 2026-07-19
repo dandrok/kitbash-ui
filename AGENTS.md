@@ -310,8 +310,11 @@ Edit `semantic.ts` only, then `tokens:build`. Do not hand-patch generated CSS/JS
 | AGENTS.md | Agent loop, git/PR rules, pins, security, a11y gates |
 | docs/a11y.md | WCAG 2.2 AA target, component checklist, testing |
 | docs/security-and-secrets.md | Tokens, Path A/B secrets, DS security bar |
+| docs/sdk-feedback.md | Pain points / wishlist for `@ktbsh/sdk` (append when blocked) |
 | docs/TASKS.md | Ordered implementation queue |
 | docs/superpowers/specs/ | Design decisions |
+
+When an SDK limitation forces a non-obvious workaround in a component, add a one-line comment in the component **and** a row in `docs/sdk-feedback.md`.
 
 Architecture source of truth for this phase:
 
