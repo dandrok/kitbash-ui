@@ -49,8 +49,8 @@ Consumers load **all** theme CSS they need; preset + theme attributes select whi
 
 | Blog component | Role | Kitbash today | Wave |
 |----------------|------|---------------|------|
-| ThemeToggle | light/dark toggle | App-level (use `applyTheme`) | docs / optional toggle recipe later |
-| UiToggle | terminal/regular | App-level (use `applyPreset`) | docs / optional later |
+| ThemeToggle | light/dark toggle | **`kitbash-theme-toggle`** | shipped (blog chrome wave) |
+| UiToggle | terminal/regular | **`kitbash-preset-toggle`** (+ `kitbash-toggle-group`) | shipped |
 | PageHeader | site header + nav | `kitbash-nav` + layout (`box`/`stack`) | compose, not new CE |
 | Footer | site footer | layout + `text`/`link` | compose |
 | FormattedDate | `<time>` | native / `text` | compose |
@@ -61,7 +61,7 @@ Consumers load **all** theme CSS they need; preset + theme attributes select whi
 | Prose | markdown body styles | **missing** (`prose` recipe or CSS) | later |
 | TerminalTitle | decorative title | `heading` + styles | compose |
 | PulseCursor | decorative caret | decorative only | site-specific CSS ok |
-| ScrollToTop | FAB control | **missing** button pattern | small component later |
+| ScrollToTop | FAB control | **`kitbash-scroll-top`** (`visible` from app scroll) | shipped |
 | BaseHead | meta/SEO | Astro only | stay in app |
 
 **Already strong in DS:** button, link, text, heading, stack, box, container, badge, nav, pagination, alert, tabs, breadcrumb, forms, loading.
@@ -72,10 +72,11 @@ Consumers load **all** theme CSS they need; preset + theme attributes select whi
 
 ## Phased work (slow)
 
-1. **Themes (this PR family)** — terminal preset + preset API + Storybook axes; no site edits.  
-2. **Visual parity pass** — Storybook snapshots of button/link/nav/pagination under 4 combos; tweak tokens only.  
-3. **Gap components** — only what composition cannot do (e.g. prose styles, scroll-to-top if shared).  
-4. **Site integration** (separate repo / expanded boundary) — load `@ktbsh/ui` themes + CEs; replace markup gradually.
+1. [x] **Themes** — terminal preset + preset API + Storybook axes (PR #15).  
+2. [ ] **Blog chrome** — theme/preset toggles, toggle-group, scroll-top.  
+3. [ ] **Visual parity pass** — tokens/spacing vs regular-ui + terminal under 4 combos.  
+4. [ ] **Gap components** — TOC / sticky nav, prose, tag polish, cards.  
+5. [ ] **Site integration** (separate repo / expanded boundary) — swap Astro pieces one by one.
 
 ---
 
