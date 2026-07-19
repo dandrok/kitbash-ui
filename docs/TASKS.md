@@ -16,10 +16,12 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 - [x] Feedback / overlay — Alert, Toast, Modal (PR #7)
 - [x] Loading indicators — Spinner, Progress, Skeleton (PR #8)
 - [x] Forms polish — Field, Radio, Switch (PR #9)
+- [x] Navigation — Tabs, Breadcrumb, Nav, Pagination (PR #10; CR follow-up PR #12)
 
 ## In progress / next
 
-- [ ] **Navigation** — Tabs, Breadcrumb, Nav, Pagination (`feat/navigation`)
+- [ ] **Package exports / publish prep** — public entry points (`package.json` exports), pack dry-run (`feat/package-exports`)
+- [ ] **Default branch rename** `master` → `main` (GitHub setting + AGENTS/CI retarget)
 
 ## Standing requirements (every component PR)
 
@@ -34,7 +36,7 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 
 1. [x] **Loading** — Spinner, Progress, Skeleton  
 2. [x] **Forms polish** — Field, Radio, Switch  
-3. [ ] **Navigation** — Tabs, Breadcrumb, Nav, Pagination  
+3. [x] **Navigation** — Tabs, Breadcrumb, Nav, Pagination (PR #10; CR follow-up PR #12)  
 4. [ ] **Package exports / publish prep** — public entry points (`package.json` exports), optional npm release CI  
 5. [ ] **Default branch rename** `master` → `main` (GitHub setting + AGENTS/CI retarget)
 

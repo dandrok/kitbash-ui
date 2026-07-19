@@ -9,7 +9,7 @@ Author once → vanilla custom elements + React wrappers + Custom Elements Manif
 | **Tags** | `kitbash-*` primitives + layout (box, stack, container, text, heading, …) |
 | **Runtime** | Bun ≥ 1.3.14 |
 
-Component playground and full prop docs will live in **Storybook** (not yet).  
+Playground: **Storybook** (`bun run storybook`).  
 Agent/process rules: [`AGENTS.md`](./AGENTS.md). Architecture: [`docs/superpowers/specs/`](./docs/superpowers/specs/).  
 Accessibility target: **WCAG 2.2 AA** — [`docs/a11y.md`](./docs/a11y.md).
 
@@ -17,14 +17,23 @@ Accessibility target: **WCAG 2.2 AA** — [`docs/a11y.md`](./docs/a11y.md).
 
 - [Bun](https://bun.sh) **1.3.14+**
 
-## Install & build
+## Install
+
+From npm (when published):
+
+```bash
+bun add @ktbsh/ui
+# or: npm install @ktbsh/ui
+```
+
+From a local clone (path / workspace):
 
 ```bash
 bun install
 bun run build
 ```
 
-Output:
+Build output:
 
 ```text
 dist/
@@ -33,11 +42,27 @@ dist/
 └── react/     # React wrappers + .d.ts
 ```
 
+## Public import map
+
+| Import | Purpose |
+|--------|---------|
+| `@ktbsh/ui` | Tokens helpers + shared types |
+| `@ktbsh/ui/vanilla/<name>` | Register `kitbash-<name>` custom element |
+| `@ktbsh/ui/react/<name>` | React wrapper (`Kitbash*`) + types |
+| `@ktbsh/ui/themes/light.css` | Light theme (`:root` default) |
+| `@ktbsh/ui/themes/dark.css` | Dark theme (`:root[data-theme="dark"]`) |
+| `@ktbsh/ui/tokens` | Token API only |
+| `@ktbsh/ui/types` | Shared TypeScript unions |
+| `@ktbsh/ui/custom-elements.json` | Custom Elements Manifest |
+
+`<name>` matches the component file (e.g. `button`, `stack`, `tab-panel`).
+
 ## Scripts
 
 | Script | Purpose |
 |--------|---------|
-| `bun run build` | Compile components with kitbash |
+| `bun run build` | kitbash compile + package entry emit (JS/d.ts/themes) |
+| `bun run package:entries` | Emit public `dist` entries after kitbash (also part of `build`) |
 | `bun run dev` | Watch rebuild |
 | `bun run lint` / `format` / `ci` | Biome |
 | `bun run typecheck` | `tsc --noEmit` |
@@ -45,6 +70,7 @@ dist/
 | `bun run storybook` | Storybook dev (port 6006) |
 | `bun run build-storybook` | Static Storybook build |
 | `bun run verify` | tokens, ci, typecheck, test, kitbash build, Storybook build |
+| `bun run pack:dry` | `npm pack --dry-run` (runs `prepack` → build once) |
 
 ## Theming (light / dark)
 
@@ -58,13 +84,10 @@ bun run tokens:check   # CI drift check
 
 Load theme CSS in the host app (variables inherit into shadow roots):
 
-```html
-<link rel="stylesheet" href="./src/tokens/themes/light.css" />
-<link rel="stylesheet" href="./src/tokens/themes/dark.css" />
-```
-
 ```ts
-import { applyTheme } from './src/tokens/index.ts';
+import '@ktbsh/ui/themes/light.css';
+import '@ktbsh/ui/themes/dark.css';
+import { applyTheme } from '@ktbsh/ui';
 
 applyTheme('dark'); // document.documentElement dataset.theme
 // light is default via :root even without data-theme
@@ -72,13 +95,20 @@ applyTheme('dark'); // document.documentElement dataset.theme
 
 Components use semantic vars such as `var(--kb-color-accent-default)`. Kitbash also injects light defaults onto `:host` from `tokens.json`.
 
-## Consume (after build)
+## Consume
 
-**Vanilla**
+**Vanilla / Astro / Svelte** — import the custom element (side-effect registration), then use the tag:
 
 ```html
 <script type="module">
-  import './dist/vanilla/button.js';
+  import '@ktbsh/ui/vanilla/button';
+</script>
+<kitbash-button variant="primary">Hello</kitbash-button>
+```
+
+```svelte
+<script>
+  import '@ktbsh/ui/vanilla/button';
 </script>
 <kitbash-button variant="primary">Hello</kitbash-button>
 ```
@@ -86,11 +116,18 @@ Components use semantic vars such as `var(--kb-color-accent-default)`. Kitbash a
 **React**
 
 ```tsx
-import { KitbashButton } from './dist/react/button.js';
+import { KitbashButton } from '@ktbsh/ui/react/button';
 
 <KitbashButton variant="primary">Hello</KitbashButton>
 ```
-**Svelte** — import the vanilla custom element and use the tag in markup.
+
+React is an **optional peer** (`react` ≥ 18). Vanilla-only apps do not need it.
+
+## Publish notes
+
+- `files` + `exports` define the npm surface; `prepack` runs `bun run build`.
+- `publishConfig.access` is `public` for the `@ktbsh` scope.
+- Dry-run: `bun run pack:dry`.
 
 ## Authoring
 

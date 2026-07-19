@@ -21,12 +21,58 @@
     "web-components",
     "custom-elements",
     "react",
-    "typescript"
+    "typescript",
+    "astro",
+    "svelte"
   ],
+  "sideEffects": [
+    "**/*.css",
+    "./dist/vanilla/**/*.js"
+  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json",
+    "./custom-elements.json": "./dist/custom-elements.json",
+    "./vanilla/*": {
+      "types": "./dist/vanilla/*.d.ts",
+      "import": "./dist/vanilla/*.js",
+      "default": "./dist/vanilla/*.js"
+    },
+    "./react/*": {
+      "types": "./dist/react/*.d.ts",
+      "import": "./dist/react/*.js",
+      "default": "./dist/react/*.js"
+    },
+    "./themes/*": "./dist/themes/*",
+    "./tokens": {
+      "types": "./dist/tokens/index.d.ts",
+      "import": "./dist/tokens/index.js",
+      "default": "./dist/tokens/index.js"
+    },
+    "./types": {
+      "types": "./dist/types/index.d.ts",
+      "import": "./dist/types/index.js",
+      "default": "./dist/types/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "tokens:build": "bun run scripts/tokens.ts build",
     "tokens:check": "bun run scripts/tokens.ts check",
-    "build": "bun run tokens:check && kitbash build",
+    "package:entries": "bun run scripts/package-entries.ts",
+    "build": "bun run tokens:check && kitbash build && bun run package:entries",
     "dev": "kitbash dev",
     "format": "biome format --write .",
     "lint": "biome lint .",
@@ -36,10 +82,20 @@
     "test": "bun test",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "verify": "bun run tokens:check && bun run ci && bun run typecheck && bun run test && bun run build && bun run build-storybook"
+    "verify": "bun run tokens:check && bun run ci && bun run typecheck && bun run test && bun run build && bun run build-storybook",
+    "prepack": "bun run build",
+    "pack:dry": "npm pack --dry-run"
   },
   "dependencies": {
     "@ktbsh/sdk": "0.2.0"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.4",
