@@ -8,15 +8,15 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 ## Done
 
 - [x] Design system architecture spec + AGENTS / security docs (PR #1)
+- [x] Foundation tooling — `@ktbsh/ui`, Biome, TypeScript, CI, GEMINI, README (PR #2)
 
 ## In progress / next
 
-- [ ] **Foundation tooling** — `@ktbsh/ui` package identity, Biome, TypeScript, scripts, CI, GEMINI, README (`chore/foundation-tooling`)
+- [ ] **Tokens & themes** — semantic TS, light/dark CSS (`:root` light fallback), generated `tokens.json`, `tokens:build` / `tokens:check` (`feat/tokens-themes`)
 
 ## Backlog
 
 - [ ] **Default branch rename** `master` → `main` (GitHub setting + AGENTS/CI retarget) — exit criteria in design spec §2.2
-- [ ] **Tokens & themes** — semantic TS, light/dark CSS (`:root` light fallback), generated `tokens.json`, `tokens:build` / `tokens:check`
 - [ ] **Storybook** — WC stories, theme toolbar, foundation MDX, CI `build-storybook`
 - [ ] **Primitives wave** — Button, Input, Textarea, Checkbox, Select, Label, Link, Badge (+ tests + stories)
 - [ ] **Layout wave** — Box, Stack, Container, Text, Heading (split if large)

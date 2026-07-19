@@ -5,6 +5,7 @@
     "target": "esnext",
     "moduleResolution": "bundler",
     "moduleDetection": "force",
+    "allowImportingTsExtensions": true,
     "strict": true,
     "skipLibCheck": true,
     "noEmit": true,
@@ -17,6 +18,6 @@
     "resolveJsonModule": true,
     "types": ["bun"]
   },
-  "include": ["src/**/*.ts", "kitbash.config.ts"],
+  "include": ["src/**/*.ts", "scripts/**/*.ts", "kitbash.config.ts"],
   "exclude": ["dist", "node_modules"]
 }

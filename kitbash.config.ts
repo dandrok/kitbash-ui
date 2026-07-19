@@ -11,6 +11,7 @@
  */
 export default {
   components: './src/components',
-  tokens: './src/tokens.json',
+  /** Generated bridge — `bun run tokens:build` (see src/tokens/semantic.ts). */
+  tokens: './src/tokens/tokens.json',
   outDir: './dist',
 };

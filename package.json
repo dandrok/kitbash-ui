@@ -24,7 +24,9 @@
     "typescript"
   ],
   "scripts": {
-    "build": "kitbash build",
+    "tokens:build": "bun run scripts/tokens.ts build",
+    "tokens:check": "bun run scripts/tokens.ts check",
+    "build": "bun run tokens:check && kitbash build",
     "dev": "kitbash dev",
     "format": "biome format --write .",
     "lint": "biome lint .",
@@ -32,7 +34,7 @@
     "ci": "biome ci .",
     "typecheck": "tsc --noEmit",
     "test": "bun test",
-    "verify": "bun run ci && bun run typecheck && bun run build"
+    "verify": "bun run tokens:check && bun run ci && bun run typecheck && bun run test && bun run build"
   },
   "dependencies": {
     "@ktbsh/sdk": "0.2.0"

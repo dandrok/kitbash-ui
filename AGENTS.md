@@ -244,15 +244,16 @@ Notes:
 - Components are **framework-agnostic** (author once via SDK → vanilla CE + React wrappers)
 - Update README / Storybook / AGENTS only where this change makes them wrong — no duplicated encyclopedias
 
-### Token source of truth (enforced when tokens PR lands)
+### Token source of truth (enforced)
 
 | Layer | Role |
 |-------|------|
-| **Source of truth** | Theme CSS (`src/tokens/themes/light.css`, `dark.css`) + semantic keys/types in `src/tokens/semantic.ts` |
-| **Compiler bridge** | `src/tokens/tokens.json` — **generated** from the source for `@ktbsh/sdk` only; never hand-edited as primary |
-| **Enforcement** | `bun run tokens:build` writes `tokens.json`; CI runs `bun run tokens:check` (drift fails the build) |
+| **Source of truth** | `src/tokens/semantic.ts` — names **and** light/dark values |
+| **Generated** | `src/tokens/themes/light.css`, `dark.css` (`:root` light fallback + `[data-theme]`) |
+| **Compiler bridge** | `src/tokens/tokens.json` — light defaults for kitbash `:host` inject; never hand-edit |
+| **Enforcement** | `bun run tokens:build` / `bun run tokens:check` (CI fails on drift) |
 
-Documented fully in the design spec §5.3. Until the tokens PR exists, scaffold `tokens.json` may remain minimal.
+Edit `semantic.ts` only, then `tokens:build`. Do not hand-patch generated CSS/JSON.
 
 ### SDK authoring footguns
 
