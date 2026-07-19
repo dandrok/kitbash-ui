@@ -1,0 +1,52 @@
+/**
+ * GENERATED FILE — do not edit by hand.
+ * Source: src/tokens/semantic.ts
+ * Regenerate: bun run tokens:build
+ */
+:root[data-theme="dark"] {
+  --kb-color-bg-canvas: #0d1117;
+  --kb-color-bg-surface: #161b22;
+  --kb-color-bg-subtle: #21262d;
+  --kb-color-bg-inverse: #e6edf3;
+  --kb-color-fg-default: #e6edf3;
+  --kb-color-fg-muted: #8b949e;
+  --kb-color-fg-subtle: #6e7681;
+  --kb-color-fg-on-accent: #ffffff;
+  --kb-color-fg-on-inverse: #0d1117;
+  --kb-color-border-default: #30363d;
+  --kb-color-border-muted: #21262d;
+  --kb-color-border-focus: #2f81f7;
+  --kb-color-accent-default: #2f81f7;
+  --kb-color-accent-hover: #58a6ff;
+  --kb-color-accent-subtle: #121d2f;
+  --kb-color-danger-default: #f85149;
+  --kb-color-danger-subtle: #2d1214;
+  --kb-color-success-default: #3fb950;
+  --kb-color-success-subtle: #12261e;
+  --kb-color-warning-default: #d29922;
+  --kb-color-warning-subtle: #2a2111;
+  --kb-space-2xs: 2px;
+  --kb-space-xs: 4px;
+  --kb-space-sm: 8px;
+  --kb-space-md: 16px;
+  --kb-space-lg: 24px;
+  --kb-space-xl: 32px;
+  --kb-space-2xl: 48px;
+  --kb-radius-sm: 4px;
+  --kb-radius-md: 8px;
+  --kb-radius-lg: 12px;
+  --kb-radius-full: 9999px;
+  --kb-font-family-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --kb-font-size-sm: 0.875rem;
+  --kb-font-size-md: 1rem;
+  --kb-font-size-lg: 1.125rem;
+  --kb-font-size-xl: 1.25rem;
+  --kb-font-weight-regular: 400;
+  --kb-font-weight-medium: 500;
+  --kb-font-weight-semibold: 600;
+  --kb-line-height-tight: 1.25;
+  --kb-line-height-normal: 1.5;
+  --kb-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --kb-shadow-md: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --kb-focus-ring: 0 0 0 3px rgba(47, 129, 247, 0.45);
+}
