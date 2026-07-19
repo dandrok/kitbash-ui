@@ -1,8 +1,8 @@
 import { defineComponent } from '@ktbsh/sdk';
 
 /**
- * Toggle switch (form-associated checkbox under the hood + `role="switch"`).
- * `checked` commits on change. Slot = optional adjacent label text.
+ * Toggle switch (checkbox + `role="switch"`).
+ * Track/thumb decorative; full-size transparent input is the hit target.
  */
 export default defineComponent({
   tag: 'kitbash-switch',
@@ -18,63 +18,82 @@ export default defineComponent({
   styles: `
     :host {
       display: inline-flex;
+      vertical-align: middle;
       font-family: var(--kb-font-family-sans);
       font-size: var(--kb-font-size-md);
       color: var(--kb-color-fg-default);
+      --kitbash-switch-w: 2.75rem;
+      --kitbash-switch-h: 1.5rem;
+      --kitbash-switch-pad: 2px;
+      --kitbash-switch-thumb: calc(
+        var(--kitbash-switch-h) - 2 * var(--kitbash-switch-pad)
+      );
+      --kitbash-switch-track: var(--kb-color-bg-subtle);
+      --kitbash-switch-track-on: var(--kb-color-accent-default);
+      --kitbash-switch-knob: #ffffff;
     }
     .label-wrap {
       display: inline-flex;
       align-items: center;
       gap: var(--kb-space-sm);
       cursor: pointer;
+      user-select: none;
     }
-    .track-wrap {
+    .switch {
       position: relative;
-      display: inline-flex;
-      align-items: center;
+      display: inline-block;
+      width: var(--kitbash-switch-w);
+      height: var(--kitbash-switch-h);
       flex-shrink: 0;
     }
     input {
       position: absolute;
-      opacity: 0;
-      width: 2.75rem;
-      height: 1.5rem;
+      inset: 0;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
       margin: 0;
+      opacity: 0;
       cursor: pointer;
-      z-index: 1;
     }
     input:disabled {
       cursor: not-allowed;
     }
     .track {
-      display: block;
-      width: 2.75rem;
-      height: 1.5rem;
-      border-radius: var(--kb-radius-full);
-      background: var(--kb-color-bg-subtle);
-      border: 1px solid var(--kb-color-border-default);
+      position: absolute;
+      inset: 0;
+      z-index: 0;
       box-sizing: border-box;
+      border-radius: 999px;
+      background: var(--kitbash-switch-track);
+      border: 1px solid var(--kb-color-border-default);
       transition: background 0.15s ease, border-color 0.15s ease;
       pointer-events: none;
     }
     .thumb {
       position: absolute;
-      top: 2px;
-      left: 2px;
-      width: calc(1.5rem - 6px);
-      height: calc(1.5rem - 6px);
-      border-radius: var(--kb-radius-full);
-      background: var(--kb-color-bg-canvas);
-      box-shadow: var(--kb-shadow-sm);
+      z-index: 1;
+      top: var(--kitbash-switch-pad);
+      left: var(--kitbash-switch-pad);
+      width: var(--kitbash-switch-thumb);
+      height: var(--kitbash-switch-thumb);
+      border-radius: 999px;
+      background: var(--kitbash-switch-knob);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
       transition: transform 0.15s ease;
       pointer-events: none;
     }
     input:checked + .track {
-      background: var(--kb-color-accent-default);
-      border-color: var(--kb-color-accent-default);
+      background: var(--kitbash-switch-track-on);
+      border-color: var(--kitbash-switch-track-on);
     }
     input:checked + .track .thumb {
-      transform: translateX(1.25rem);
+      transform: translateX(
+        calc(
+          var(--kitbash-switch-w) - var(--kitbash-switch-thumb) - 2 *
+            var(--kitbash-switch-pad)
+        )
+      );
     }
     input:focus-visible + .track {
       box-shadow: var(--kb-focus-ring);
@@ -98,11 +117,10 @@ export default defineComponent({
   events: {
     click(e: Event) {
       const host = e.currentTarget as HTMLElement;
+      if (e.composedPath()[0] !== host) return;
       const input = host.shadowRoot?.querySelector('input');
       if (!input || input.disabled) return;
-      if (!e.composedPath().includes(input)) {
-        input.click();
-      }
+      input.click();
     },
     'change input'(e: Event, { commit }) {
       const target = e.target as HTMLInputElement;
@@ -114,7 +132,7 @@ export default defineComponent({
   render({ props, html }) {
     return html`
       <label part="switch-container" class="label-wrap">
-        <span class="track-wrap" part="switch-wrap">
+        <span class="switch" part="switch-wrap">
           <input
             part="switch-input"
             type="checkbox"

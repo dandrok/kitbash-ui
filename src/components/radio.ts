@@ -2,10 +2,7 @@ import { defineComponent } from '@ktbsh/sdk';
 
 /**
  * Radio option (form-associated).
- * Use the same `name` across options in a group. Slot = visible label text.
- *
- * Note: cross-CE radio grouping depends on browser form association;
- * prefer placing radios in one form and reading `kitbash-change` for UI state.
+ * Same `name` groups options across shadow roots (manual uncheck).
  */
 export default defineComponent({
   tag: 'kitbash-radio',
@@ -22,6 +19,7 @@ export default defineComponent({
   styles: `
     :host {
       display: inline-flex;
+      vertical-align: middle;
       font-family: var(--kb-font-family-sans);
       font-size: var(--kb-font-size-md);
       color: var(--kb-color-fg-default);
@@ -31,13 +29,16 @@ export default defineComponent({
       align-items: center;
       gap: var(--kb-space-sm);
       cursor: pointer;
+      user-select: none;
     }
     input {
+      appearance: auto;
       width: 1.125rem;
       height: 1.125rem;
       min-width: 1.125rem;
       min-height: 1.125rem;
       margin: 0;
+      flex-shrink: 0;
       accent-color: var(--kb-color-accent-default);
       cursor: pointer;
     }
@@ -58,17 +59,44 @@ export default defineComponent({
     }
   `,
   events: {
-    // Outer <label> click activates host CE — forward to shadow input once
+    // Outer <label for> retargets onto the host only — not shadow UI
     click(e: Event) {
       const host = e.currentTarget as HTMLElement;
+      if (e.composedPath()[0] !== host) return;
       const input = host.shadowRoot?.querySelector('input');
       if (!input || input.disabled) return;
-      if (!e.composedPath().includes(input)) {
-        input.click();
-      }
+      input.click();
     },
-    'change input'(e: Event, { commit }) {
+    'change input'(e: Event, { commit, props }) {
       const target = e.target as HTMLInputElement;
+      const host = (target.getRootNode() as ShadowRoot).host as HTMLElement;
+      const name = typeof props.name === 'string' ? props.name : '';
+
+      if (target.checked && name && typeof document !== 'undefined') {
+        const radios: HTMLElement[] = [];
+        const walk = (root: ParentNode) => {
+          root.querySelectorAll('kitbash-radio').forEach((el) => {
+            radios.push(el as HTMLElement);
+          });
+          root.querySelectorAll('*').forEach((el) => {
+            const sr = (el as HTMLElement).shadowRoot;
+            if (sr) walk(sr);
+          });
+        };
+        walk(document);
+
+        radios.forEach((el) => {
+          if (el === host) return;
+          const other = el as HTMLElement & {
+            name?: string;
+            checked?: boolean;
+          };
+          if (other.name === name && other.checked) {
+            other.checked = false;
+          }
+        });
+      }
+
       commit({
         props: { checked: target.checked },
       });
