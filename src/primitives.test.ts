@@ -30,6 +30,12 @@ describe('primitive components', () => {
       'field.ts',
       'radio.ts',
       'switch.ts',
+      'tabs.ts',
+      'tab.ts',
+      'tab-panel.ts',
+      'breadcrumb.ts',
+      'nav.ts',
+      'pagination.ts',
     ]) {
       expect(files.includes(name), name).toBe(true);
     }

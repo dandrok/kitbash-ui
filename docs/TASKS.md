@@ -15,16 +15,17 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 - [x] Layout wave — Box, Stack, Container, Text, Heading (PR #6)
 - [x] Feedback / overlay — Alert, Toast, Modal (PR #7)
 - [x] Loading indicators — Spinner, Progress, Skeleton (PR #8)
+- [x] Forms polish — Field, Radio, Switch (PR #9)
 
 ## In progress / next
 
-- [ ] **Forms polish** — Field, Radio, Switch (`feat/forms-polish`)
+- [ ] **Navigation** — Tabs, Breadcrumb, Nav, Pagination (`feat/navigation`)
 
 ## Standing requirements (every component PR)
 
 - **A11y / WCAG 2.2 AA** from first ship — see `docs/a11y.md` and `AGENTS.md`
 - **Tokens only** via semantic `--kb-*` (incl. radius/space/type — not colors only)
-- **agy** pre-commit (`gemini-3.1-pro-high`) + branch/PR workflow
+- **Dual review** — `cr review` + `agy --model gemini-3.1-pro-high` before every commit
 - **Storybook stories** for new components
 
 ## Planned waves (backlog)
@@ -32,8 +33,8 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 ### Near-term (recommended order)
 
 1. [x] **Loading** — Spinner, Progress, Skeleton  
-2. [ ] **Forms polish** — Field (label + control + hint + error), Radio group, Switch  
-3. [ ] **Navigation** — Tabs, Breadcrumb, simple Nav / Pagination  
+2. [x] **Forms polish** — Field, Radio, Switch  
+3. [ ] **Navigation** — Tabs, Breadcrumb, Nav, Pagination  
 4. [ ] **Package exports / publish prep** — public entry points (`package.json` exports), optional npm release CI  
 5. [ ] **Default branch rename** `master` → `main` (GitHub setting + AGENTS/CI retarget)
 
