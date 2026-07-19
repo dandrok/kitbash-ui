@@ -8,15 +8,64 @@
 
 ---
 
+## ⛔ REPOSITORY HARD BOUNDARY (strict — non-negotiable)
+
+**Allowed repository (only):**
+
+| | |
+|--|--|
+| **Local path** | `/home/dandrok/git/kitbash-ui` (this workspace) |
+| **GitHub** | `dandrok/kitbash-ui` only (`https://github.com/dandrok/kitbash-ui`) |
+
+The operator may have **global** `gh` / SSH auth that can reach other repos. That does **not** grant the agent permission. Agents act **as the user** and must behave as if access is **scoped to this one repository forever**.
+
+### Absolute bans (even if the user asks)
+
+| Ban | Why |
+|-----|-----|
+| **Any other GitHub repo** | No `gh` / `git` / API against other owners or names |
+| **Clone other repos** into or outside this workspace for agent work | Out of scope |
+| **Create / delete / fork** other repositories | Out of scope |
+| **Push, PR, issue, release, secret, or settings** outside `dandrok/kitbash-ui` | Blast radius |
+| **Browse / list** the user’s other repos (`gh repo list`, org inventory, etc.) | Curiosity ≠ permission |
+| **Force-push** default branch, **delete** remote branches without explicit ask for *this* repo, **rewrite** published history | Destructive |
+| **`rm -rf`**, mass delete, or wipe `node_modules`/git history as “cleanup” without need | Harmful |
+| **Change global git/gh config** (e.g. `gh auth logout`, `git config --global`) | Affects the whole machine |
+| Use sibling paths like `../kitbash-sdk` as a **write** target | Read-only reference only when needed for API clues; **never** commit/push there |
+
+If asked to touch another repository: **refuse**, restate this boundary, and stay in `dandrok/kitbash-ui`.
+
+### Required guardrails before every `gh` / remote git command
+
+1. **CWD must be this repo:** `pwd` resolves under `…/kitbash-ui` (or git root is this project).
+2. **Confirm remote:** `git remote get-url origin` is `git@github.com:dandrok/kitbash-ui.git` or `https://github.com/dandrok/kitbash-ui.git` (no other host/path).
+3. **Prefer explicit repo flag for `gh`:** always pass `-R dandrok/kitbash-ui` (or `--repo dandrok/kitbash-ui`) so a wrong cwd cannot hit another project.
+4. **Never** omit the check because “auth is global” or “user said do it on X repo.”
+5. **Read-only peek at kitbash-sdk** (path `../kitbash-sdk`) is allowed only for understanding `@ktbsh/sdk` APIs — no edits, no git commands that mutate it, no `gh` for that repo unless the user later expands this file’s boundary in writing in-repo.
+
+### Safety posture (do no harm)
+
+- Prefer **branch + PR**; never commit on the default branch.
+- Prefer **additive, reversible** changes; ask before destructive ops even inside this repo (force-push, delete branch on remote, `git reset --hard` of shared work, drop files the user may need).
+- Do **not** merge PRs, change branch protection, or rotate secrets unless the user explicitly requests it **for this repo**.
+- Do **not** print tokens, cookies, or full `gh auth token` output into logs or commits.
+- If unsure whether a command leaves this repo: **do not run it**.
+
+**Self-check line (run mentally before risky commands):**  
+“Is the only repository touched `dandrok/kitbash-ui`? If not → stop.”
+
+---
+
 ## Security (mandatory)
 
 | Rule | Detail |
 |------|--------|
+| Repo isolation | **Only** `dandrok/kitbash-ui` — see hard boundary above |
 | No secrets in git | `.env` / `.env.*` gitignored; only `.env.example` committed |
 | No secrets in the DS | Components and published builds never embed API keys or tokens |
 | Local secrets | Copy `.env.example` → `.env` (Path A). Guide: `docs/security-and-secrets.md` |
 | CI secrets | Path B uses **GitHub Actions secrets**, not the local `.env` file |
-| Least privilege | Fine-grained PAT scoped to this repo; prefer `gh auth login` locally |
+| `gh` usage | Global login may exist; agent still scopes every command to **this repo only** (`-R dandrok/kitbash-ui`) |
 
 If a secret is ever committed: rotate it immediately, purge from history if needed, and treat the leak as an incident.
 
@@ -55,10 +104,10 @@ Until rename lands, all agent/CI/`gh`/`cr` bases use **`master`**. After rename,
 
 3. Develop → verify → dual review → commit on the branch only
 
-4. Push the branch and open a PR
+4. Push the branch and open a PR (this repo only)
    git push -u origin HEAD
-   gh pr create --base master …
-   # After rename: gh pr create --base main …
+   gh pr create -R dandrok/kitbash-ui --base master …
+   # After rename: gh pr create -R dandrok/kitbash-ui --base main …
 
 5. Do not merge your own PR unless the user asks.
    After the user merges: pull the default branch, pick the next task, new branch.
@@ -98,9 +147,9 @@ If you already committed on the default branch by mistake: move commits to a fea
    - Clear message: why + what
    - No secrets; do not amend published history unless asked
 
-5. OPEN PR + WAIT
-   - gh pr create --base master   # after rename: --base main
-   - Poll: gh pr view <n> --json state,mergedAt
+5. OPEN PR + WAIT (always -R dandrok/kitbash-ui)
+   - gh pr create -R dandrok/kitbash-ui --base master   # after rename: --base main
+   - Poll: gh pr view -R dandrok/kitbash-ui <n> --json state,mergedAt
    - MERGED → checkout master (or main), pull, mark task done, next branch
    - CLOSED without merge → halt and report
 ```
