@@ -209,6 +209,30 @@ Notes:
 
 ---
 
+## Craftsmanship (no rush, no trash, no security holes)
+
+**Speed never beats correctness.** Take the time the change needs. Prefer one solid slice over a sloppy pile of files.
+
+| Do | Don’t |
+|----|--------|
+| Read surrounding code and the design spec before editing | Drive-by “while I’m here” refactors |
+| KISS / DRY — smallest clear design that works | Clever abstractions, copy-paste twins, dead code |
+| Strong TypeScript types for public APIs and component props | `any`, silent casts, undocumented stringly APIs |
+| Semantic tokens, a11y basics, focus/disabled/invalid states | Hard-coded one-off styles or insecure HTML injection |
+| Verify fully, then **`agy --model gemini-3.1-pro-high`**, then commit | Rush commits, skip review, “fix later” |
+| Secrets never in source, `dist/`, Storybook, or logs | Tokens in env committed to git, XSS via untrusted HTML |
+
+**Security (product + process):**
+
+- No secrets in the package; least privilege for `gh` (this repo only).
+- Prefer text/slots over HTML injection; if rich HTML ever appears, sanitize and document.
+- Pin deps and Actions SHAs; frozen lockfile in CI.
+- Destructive git only with explicit user ask for **this** repo.
+
+**Code quality bar for `@ktbsh/ui`:** professional design-system standard — clear names, stable props, tested behavior, Storybook-ready when components land. If it looks like prototype trash, rewrite before commit.
+
+---
+
 ## Project pins & quality bar
 
 - **Package:** `@ktbsh/ui` — design system built with `@ktbsh/sdk`
