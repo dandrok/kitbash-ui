@@ -123,11 +123,30 @@ import { KitbashButton } from '@ktbsh/ui/react/button';
 
 React is an **optional peer** (`react` ≥ 18). Vanilla-only apps do not need it.
 
-## Publish notes
+## Publish / release
 
-- `files` + `exports` define the npm surface; `prepack` runs `bun run build`.
-- `publishConfig.access` is `public` for the `@ktbsh` scope.
-- Dry-run: `bun run pack:dry`.
+- **Package:** `@ktbsh/ui` (public). `files` + `exports` define the npm surface; `prepack` runs `bun run build`.
+- **Dry-run:** `bun run pack:dry`.
+- **CI does not publish on every merge.** Releases are **git tags** only.
+
+### Cut a release (maintainers)
+
+1. On `master`, set `"version"` in `package.json` (semver). First release is already `0.1.0`.
+2. Merge any open work; `master` green.
+3. Tag and push (must match version):
+
+```bash
+git checkout master && git pull
+# version in package.json is e.g. 0.1.0
+git tag v0.1.0
+git push origin v0.1.0
+```
+
+4. GitHub Actions workflow **Publish** runs `bun run verify` then `npm publish` using secret `NPM_TOKEN`.
+5. Check: https://www.npmjs.com/package/@ktbsh/ui
+
+Semver guide: **patch** fixes, **minor** new components/exports, **major** breaking changes.  
+Consumers should pin early (`0.1.0` or `~0.1.0`), not track every git commit.
 
 ## Authoring
 
