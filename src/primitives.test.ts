@@ -27,6 +27,9 @@ describe('primitive components', () => {
       'spinner.ts',
       'progress.ts',
       'skeleton.ts',
+      'field.ts',
+      'radio.ts',
+      'switch.ts',
     ]) {
       expect(files.includes(name), name).toBe(true);
     }

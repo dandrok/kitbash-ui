@@ -14,10 +14,11 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 - [x] Primitives wave — Button through Badge (PR #5)
 - [x] Layout wave — Box, Stack, Container, Text, Heading (PR #6)
 - [x] Feedback / overlay — Alert, Toast, Modal (PR #7)
+- [x] Loading indicators — Spinner, Progress, Skeleton (PR #8)
 
 ## In progress / next
 
-- [ ] **Loading indicators** — Spinner, Progress, Skeleton (`feat/loading-indicators`)
+- [ ] **Forms polish** — Field, Radio, Switch (`feat/forms-polish`)
 
 ## Standing requirements (every component PR)
 
@@ -30,7 +31,7 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 
 ### Near-term (recommended order)
 
-1. [ ] **Loading** — Spinner, Progress (determinate + indeterminate), Skeleton  
+1. [x] **Loading** — Spinner, Progress, Skeleton  
 2. [ ] **Forms polish** — Field (label + control + hint + error), Radio group, Switch  
 3. [ ] **Navigation** — Tabs, Breadcrumb, simple Nav / Pagination  
 4. [ ] **Package exports / publish prep** — public entry points (`package.json` exports), optional npm release CI  
