@@ -1,6 +1,7 @@
 import { expect, test } from 'bun:test';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
+import { pathToFileURL } from 'node:url';
 import pkg from '../package.json';
 
 const root = resolve(import.meta.dir, '..');
@@ -59,7 +60,7 @@ test('react is an optional peer dependency', () => {
 });
 
 test('built component, theme, and entry files resolve for documented subpaths', () => {
-  // After `bun run build` these must exist for consumers / Storybook.
+  // CI runs `bun run build` before tests so dist exists on a clean checkout.
   const required = [
     'dist/index.js',
     'dist/index.d.ts',
@@ -81,7 +82,14 @@ test('built component, theme, and entry files resolve for documented subpaths', 
 });
 
 test('compiled root entry re-exports tokens helpers', async () => {
-  const api = await import('../dist/index.js');
+  // Dynamic URL import so typecheck does not require dist/*.d.ts on disk.
+  const href = pathToFileURL(resolve(root, 'dist/index.js')).href;
+  const api = (await import(href)) as {
+    applyTheme: unknown;
+    getTheme: unknown;
+    cssVarName: unknown;
+    semanticTokens: unknown;
+  };
   expect(typeof api.applyTheme).toBe('function');
   expect(typeof api.getTheme).toBe('function');
   expect(typeof api.cssVarName).toBe('function');

@@ -42,12 +42,13 @@ jobs:
       - name: Typecheck
         run: bun run typecheck
 
+      - name: Build (kitbash + package entries)
+        # Build before tests: package smoke tests assert dist/ artifacts.
+        # Use package script so PATH resolves kitbash via bun.
+        run: bun run build
+
       - name: Tests
         run: bun run test
-
-      - name: Build (kitbash)
-        # Use package script so PATH resolves kitbash via bun
-        run: bun run build
 
       - name: Build Storybook
         # kitbash dist already built; avoid re-running tokens:check/build

@@ -82,7 +82,7 @@
     "test": "bun test",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "verify": "bun run tokens:check && bun run ci && bun run typecheck && bun run test && bun run build && bun run build-storybook",
+    "verify": "bun run tokens:check && bun run ci && bun run typecheck && bun run build && bun run test && bun run build-storybook",
     "prepack": "bun run build",
     "pack:dry": "npm pack --dry-run"
   },
