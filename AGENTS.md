@@ -144,9 +144,16 @@ This is as strict as the repository hard boundary.
 
 ### Required `agy` invocation (copy/paste)
 
+**Model (mandatory):** `--model gemini-3.1-pro-high`  
+→ **Gemini 3.1 Pro (High)** — strongest 3.1 Pro tier; same pin as kitbash-sdk dual-review. Do **not** drop to Flash/Low for pre-commit review.
+
 ```bash
 # From this repo only. Read-only. Do not edit files.
-agy --mode plan --sandbox --dangerously-skip-permissions \
+agy --model gemini-3.1-pro-high \
+  --mode plan \
+  --sandbox \
+  --dangerously-skip-permissions \
+  --print-timeout 15m \
   -p "READ-ONLY review of current uncommitted changes (and branch vs master if needed) in dandrok/kitbash-ui ONLY. Do not edit files. Do not touch other repos. Report: (1) real bugs/security (2) CI/config mistakes (3) nits worth fixing before commit (4) noise to ignore. Be concise."
 ```
 
@@ -154,7 +161,9 @@ Notes:
 
 - Prefer `--mode plan` (not accept-edits). Review must not silently rewrite the tree.
 - `--dangerously-skip-permissions` is only for headless tool access in review; still instruct **do not edit**.
+- `--print-timeout 15m` avoids false “timeout waiting for response” on larger diffs (default 5m is often too short).
 - If uncommitted is empty but the branch has unreviewed commits (process breach): run `agy` on `git diff master...HEAD`, fix, then commit the fixes — do not add more unreviewed work.
+- Optional heavier model (only if user asks): `claude-opus-4-6-thinking` or whatever `agy models` lists as Opus Thinking — default remains **`gemini-3.1-pro-high`**.
 
 ### Forbidden rationalizations
 
