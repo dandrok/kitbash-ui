@@ -6,7 +6,7 @@ Author once → vanilla custom elements + React wrappers + Custom Elements Manif
 | | |
 |--|--|
 | **Package** | `@ktbsh/ui` |
-| **Tags** | `kitbash-*` (production tags land with the primitives PR; scaffold still has `my-button` / `kitbash-input`) |
+| **Tags** | `kitbash-*` (button, input, label, textarea, checkbox, select, link, badge) |
 | **Runtime** | Bun ≥ 1.3.14 |
 
 Component playground and full prop docs will live in **Storybook** (not yet).  
@@ -80,17 +80,16 @@ Components use semantic vars such as `var(--kb-color-accent-default)`. Kitbash a
 <script type="module">
   import './dist/vanilla/button.js';
 </script>
-<my-button variant="primary">Hello</my-button>
+<kitbash-button variant="primary">Hello</kitbash-button>
 ```
 
 **React**
 
 ```tsx
-import { MyButton } from './dist/react/button.js';
+import { KitbashButton } from './dist/react/button.js';
 
-<MyButton variant="primary">Hello</MyButton>
+<KitbashButton variant="primary">Hello</KitbashButton>
 ```
-
 **Svelte** — import the vanilla custom element and use the tag in markup.
 
 ## Authoring

@@ -2,6 +2,7 @@ import type { Meta, StoryObj } from '@storybook/web-components-vite';
 import { html } from 'lit';
 
 import '../dist/vanilla/input.js';
+import '../dist/vanilla/label.js';
 
 type InputArgs = {
   name: string;
@@ -9,29 +10,28 @@ type InputArgs = {
   placeholder: string;
   required: boolean;
   invalid: boolean;
+  disabled: boolean;
+  size: 'sm' | 'md' | 'lg';
 };
 
-/**
- * Form-associated `kitbash-input`. Pair with Label in the primitives wave for full a11y naming.
- * Stories demonstrate invalid/required states for keyboard + AT checks.
- */
 const meta = {
   title: 'Components/Input',
   component: 'kitbash-input',
   tags: ['autodocs'],
   argTypes: {
-    name: { control: 'text' },
-    value: { control: 'text' },
-    placeholder: { control: 'text' },
+    size: { control: 'select', options: ['sm', 'md', 'lg'] },
     required: { control: 'boolean' },
     invalid: { control: 'boolean' },
+    disabled: { control: 'boolean' },
   },
   args: {
-    name: 'example',
+    name: 'email',
     value: '',
-    placeholder: 'Type here…',
+    placeholder: 'you@example.com',
     required: false,
     invalid: false,
+    disabled: false,
+    size: 'md',
   },
 } satisfies Meta<InputArgs>;
 
@@ -40,54 +40,30 @@ type Story = StoryObj<InputArgs>;
 
 export const Default: Story = {
   render: (args) => html`
-    <label style="display: flex; flex-direction: column; gap: 8px; max-width: 320px;">
-      <span>Example field</span>
+    <div style="display: flex; flex-direction: column; gap: 8px; max-width: 320px;">
+      <kitbash-label for="story-input" ?required=${args.required}>
+        Email
+      </kitbash-label>
       <kitbash-input
+        id="story-input"
         name=${args.name}
+        size=${args.size}
         .value=${args.value}
         placeholder=${args.placeholder}
         ?required=${args.required}
         ?invalid=${args.invalid}
+        ?disabled=${args.disabled}
       ></kitbash-input>
-    </label>
+    </div>
   `,
 };
 
 export const Invalid: Story = {
-  args: {
-    invalid: true,
-    value: '',
-    placeholder: 'Invalid state',
-  },
-  render: (args) => html`
-    <label style="display: flex; flex-direction: column; gap: 8px; max-width: 320px;">
-      <span>Invalid field</span>
-      <kitbash-input
-        name=${args.name}
-        .value=${args.value}
-        placeholder=${args.placeholder}
-        ?required=${args.required}
-        ?invalid=${args.invalid}
-      ></kitbash-input>
-    </label>
-  `,
+  args: { invalid: true, placeholder: 'Invalid' },
+  render: Default.render,
 };
 
 export const Required: Story = {
-  args: {
-    required: true,
-    placeholder: 'Required',
-  },
-  render: (args) => html`
-    <label style="display: flex; flex-direction: column; gap: 8px; max-width: 320px;">
-      <span>Required field</span>
-      <kitbash-input
-        name=${args.name}
-        .value=${args.value}
-        placeholder=${args.placeholder}
-        ?required=${args.required}
-        ?invalid=${args.invalid}
-      ></kitbash-input>
-    </label>
-  `,
+  args: { required: true },
+  render: Default.render,
 };
