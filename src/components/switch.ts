@@ -2,7 +2,9 @@ import { defineComponent } from '@ktbsh/sdk';
 
 /**
  * Toggle switch (checkbox + `role="switch"`).
- * Track/thumb decorative; full-size transparent input is the hit target.
+ *
+ * Visual: squared “slab” track (terminal-friendly) with a solid thumb and
+ * fixed 1/0 gutter glyphs — not a generic iOS pill. All colors from `--kb-*`.
  */
 export default defineComponent({
   tag: 'kitbash-switch',
@@ -22,15 +24,12 @@ export default defineComponent({
       font-family: var(--kb-font-family-sans);
       font-size: var(--kb-font-size-md);
       color: var(--kb-color-fg-default);
-      --kitbash-switch-w: 2.75rem;
-      --kitbash-switch-h: 1.5rem;
-      --kitbash-switch-pad: 2px;
+      --kitbash-switch-w: 2.85rem;
+      --kitbash-switch-h: 1.45rem;
+      --kitbash-switch-pad: 3px;
       --kitbash-switch-thumb: calc(
         var(--kitbash-switch-h) - 2 * var(--kitbash-switch-pad)
       );
-      --kitbash-switch-track: var(--kb-color-bg-subtle);
-      --kitbash-switch-track-on: var(--kb-color-accent-default);
-      --kitbash-switch-knob: #ffffff;
     }
     .label-wrap {
       display: inline-flex;
@@ -64,11 +63,39 @@ export default defineComponent({
       inset: 0;
       z-index: 0;
       box-sizing: border-box;
-      border-radius: 999px;
-      background: var(--kitbash-switch-track);
-      border: 1px solid var(--kb-color-border-default);
-      transition: background 0.15s ease, border-color 0.15s ease;
+      border-radius: var(--kb-radius-sm);
+      background: var(--kb-color-bg-canvas);
+      border: 2px solid var(--kb-color-border-default);
+      transition:
+        background 0.15s ease,
+        border-color 0.15s ease;
       pointer-events: none;
+      overflow: hidden;
+    }
+    /* Terminal-ish status glyphs in the gutter */
+    .track::before,
+    .track::after {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.55rem;
+      font-weight: var(--kb-font-weight-semibold);
+      letter-spacing: 0.04em;
+      line-height: 1;
+      pointer-events: none;
+      opacity: 0.55;
+    }
+    .track::before {
+      content: '1';
+      left: 0.35rem;
+      color: var(--kb-color-fg-on-accent);
+      opacity: 0;
+    }
+    .track::after {
+      content: '0';
+      right: 0.35rem;
+      color: var(--kb-color-fg-muted);
+      opacity: 0.7;
     }
     .thumb {
       position: absolute;
@@ -77,31 +104,44 @@ export default defineComponent({
       left: var(--kitbash-switch-pad);
       width: var(--kitbash-switch-thumb);
       height: var(--kitbash-switch-thumb);
-      border-radius: 999px;
-      background: var(--kitbash-switch-knob);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
-      transition: transform 0.15s ease;
+      border-radius: calc(var(--kb-radius-sm) - 1px);
+      background: var(--kb-color-fg-muted);
+      border: 1px solid var(--kb-color-border-default);
+      box-shadow: var(--kb-shadow-sm);
+      transition:
+        transform 0.15s ease,
+        background 0.15s ease,
+        border-color 0.15s ease;
       pointer-events: none;
     }
     input:checked + .track {
-      background: var(--kitbash-switch-track-on);
-      border-color: var(--kitbash-switch-track-on);
+      background: var(--kb-color-accent-default);
+      border-color: var(--kb-color-accent-default);
+    }
+    input:checked + .track::before {
+      opacity: 0.9;
+    }
+    input:checked + .track::after {
+      opacity: 0;
     }
     input:checked + .track .thumb {
       transform: translateX(
         calc(
           var(--kitbash-switch-w) - var(--kitbash-switch-thumb) - 2 *
-            var(--kitbash-switch-pad)
+            var(--kitbash-switch-pad) - 4px
         )
       );
+      background: var(--kb-color-fg-on-accent);
+      border-color: transparent;
+      box-shadow: none;
     }
     input:focus-visible + .track {
       box-shadow: var(--kb-focus-ring);
     }
     input:disabled + .track {
-      opacity: 0.55;
+      opacity: 0.5;
     }
-    input[aria-invalid="true"] + .track {
+    input[aria-invalid='true'] + .track {
       border-color: var(--kb-color-danger-default);
     }
     .label {

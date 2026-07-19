@@ -21,9 +21,11 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 
 ## In progress / next
 
-- [ ] **Blog chrome** — theme/preset toggles, toggle-group, scroll-top (`feat/blog-chrome-toggles`)
+- [x] **Blog chrome** — theme/preset toggles, toggle-group, scroll-top (PR #17)
+- [x] **Form control visuals** — custom checkbox/radio/switch/select + dark skeleton (PR #18)
 - [x] **Theme presets (astro-blog-md)** — terminal + default light/dark (PR #15, npm 0.2.0)
 - [x] **npm first release** — publish workflow + operator release
+- [ ] **Next** — visual token parity, TOC/sticky nav, prose, then site integration
 - [ ] ~~Default branch rename `master` → `main`~~ — optional; skip unless desired
 
 ## Standing requirements (every component PR)

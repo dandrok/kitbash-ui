@@ -34,24 +34,58 @@ export default defineComponent({
       font-family: var(--kb-font-family-sans);
     }
     select {
+      appearance: none;
+      -webkit-appearance: none;
       box-sizing: border-box;
       width: 100%;
       min-height: 2.25rem;
-      padding: var(--kb-space-sm) var(--kb-space-md);
+      padding: var(--kb-space-sm) 2.5rem var(--kb-space-sm) var(--kb-space-md);
       border: 1px solid var(--kb-color-border-default);
       border-radius: var(--kb-radius-sm);
-      background: var(--kb-color-bg-canvas);
+      background-color: var(--kb-color-bg-canvas);
+      /* Custom chevron (token-colored); listbox chrome is still browser-native */
+      background-image:
+        linear-gradient(
+          45deg,
+          transparent 50%,
+          var(--kb-color-fg-muted) 50%
+        ),
+        linear-gradient(
+          135deg,
+          var(--kb-color-fg-muted) 50%,
+          transparent 50%
+        ),
+        linear-gradient(
+          to right,
+          transparent,
+          transparent
+        );
+      background-position:
+        calc(100% - 1.15rem) calc(50% - 0.1rem),
+        calc(100% - 0.8rem) calc(50% - 0.1rem),
+        100% 0;
+      background-size:
+        0.35rem 0.35rem,
+        0.35rem 0.35rem,
+        2.25rem 100%;
+      background-repeat: no-repeat;
       color: var(--kb-color-fg-default);
       font-size: var(--kb-font-size-md);
       font-family: inherit;
       line-height: var(--kb-line-height-normal);
       cursor: pointer;
       outline: none;
+      transition:
+        border-color 0.12s ease,
+        box-shadow 0.12s ease;
+    }
+    select:hover:not(:disabled) {
+      border-color: var(--kb-color-border-focus);
     }
     :host([size="sm"]) select {
       min-height: 2rem;
       font-size: var(--kb-font-size-sm);
-      padding: var(--kb-space-xs) var(--kb-space-sm);
+      padding: var(--kb-space-xs) 2.25rem var(--kb-space-xs) var(--kb-space-sm);
     }
     :host([size="lg"]) select {
       min-height: 2.75rem;
@@ -67,6 +101,11 @@ export default defineComponent({
     }
     select[aria-invalid="true"] {
       border-color: var(--kb-color-danger-default);
+    }
+    option,
+    optgroup {
+      background: var(--kb-color-bg-canvas);
+      color: var(--kb-color-fg-default);
     }
     /* Light-DOM options are cloned into <select>; keep the source slot out of layout */
     slot {

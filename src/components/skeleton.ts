@@ -18,14 +18,18 @@ export default defineComponent({
     .root {
       display: block;
       box-sizing: border-box;
+      /* Use accent-subtle + border for contrast in dark / terminal (surface≈subtle fails) */
       background: linear-gradient(
         90deg,
         var(--kb-color-bg-subtle) 0%,
-        var(--kb-color-bg-surface) 50%,
+        var(--kb-color-accent-subtle) 40%,
+        var(--kb-color-border-muted) 50%,
+        var(--kb-color-accent-subtle) 60%,
         var(--kb-color-bg-subtle) 100%
       );
-      background-size: 200% 100%;
-      animation: kitbash-skeleton 1.2s ease-in-out infinite;
+      background-size: 220% 100%;
+      border: 1px solid var(--kb-color-border-muted);
+      animation: kitbash-skeleton 1.35s ease-in-out infinite;
     }
     .text {
       height: 0.875em;
@@ -52,6 +56,7 @@ export default defineComponent({
       .root {
         animation: none;
         background: var(--kb-color-bg-subtle);
+        border-color: var(--kb-color-border-default);
       }
     }
   `,
