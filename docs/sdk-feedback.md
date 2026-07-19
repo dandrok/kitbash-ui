@@ -26,6 +26,18 @@ When something is painful, missing, or workaround-heavy, capture it here so SDK 
 
 ## P0 — correctness / a11y / forms
 
+### 0. `tokens.json` injection on `:host` blocks document theming
+
+**Need:** Components resolve `--kb-*` from the document (`:root[data-theme]`, presets) so light/dark and brand packs work.
+
+**Today:** Compiler prepends `:host { --token: <absolute light value>; … }` from `tokens.json` into every component stylesheet. Those declarations win over inheritance from `:root`, so Storybook/app theme toggles **do not recolor** shadow UI.
+
+**Workaround (kitbash-ui):** Omit `tokens` from `kitbash.config.ts`. Require consumers to load theme CSS on `:root`. Keep generating `tokens.json` only as a reference bridge.
+
+**SDK idea:** Either skip host injection when theming is external, or emit inherit-safe defaults only, e.g. components use `var(--kb-x, <fallback>)` without redefining `--kb-x` on `:host`. Optional `tokens.inject: 'host' | 'none' | 'fallback'`.
+
+---
+
 ### 1. No component lifecycle hooks
 
 **Need:** Run logic after open/render (modal focus trap, focus first control, mount `MutationObserver` cleanly, measure layout).

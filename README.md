@@ -100,7 +100,9 @@ applyPreset('terminal'); // data-kb-preset — default | terminal
 ```
 
 Two axes (same idea as the personal blog): **theme** (light/dark) × **preset** (default/terminal).  
-Components use only semantic vars such as `var(--kb-color-accent-default)`. Kitbash also injects light defaults onto `:host` from `tokens.json`.
+Components use only semantic vars such as `var(--kb-color-accent-default)`, **inherited from document** theme CSS.
+
+> **Required:** load theme stylesheets on the app shell (`:root`). We do **not** bake absolute token values onto each component `:host` — that sealed the shadow tree and blocked theme toggles (see `docs/sdk-feedback.md` P0 #0).
 
 ## Consume
 

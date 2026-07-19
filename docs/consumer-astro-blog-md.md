@@ -84,3 +84,8 @@ Consumers load **all** theme CSS they need; preset + theme attributes select whi
 - Existing `data-theme` light/dark default (no preset) still works.  
 - `@ktbsh/ui@0.1.0` export paths for `./themes/light.css` and `./themes/dark.css` stay valid.  
 - Components keep **only** `var(--kb-*)` — presets only reassign those variables.
+
+### Theming caveat (fixed in kitbash-ui)
+
+SDK `tokens.json` → `:host { --kb-*: #fixed }` **blocks** inheritance from document themes.  
+kitbash-ui **omits** the compiler `tokens` config so CEs inherit `:root` theme CSS. Always load theme stylesheets in the host app / Storybook.
