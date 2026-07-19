@@ -15,9 +15,9 @@ permissions:
 
 jobs:
   check:
-    name: Lint, typecheck & build
+    name: Lint, typecheck, build & Storybook
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
 
     steps:
       - name: Checkout
@@ -48,3 +48,7 @@ jobs:
       - name: Build (kitbash)
         # Use package script so PATH resolves kitbash via bun
         run: bun run build
+
+      - name: Build Storybook
+        # kitbash dist already built; avoid re-running tokens:check/build
+        run: bun run build-storybook

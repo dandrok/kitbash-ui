@@ -42,7 +42,9 @@ dist/
 | `bun run lint` / `format` / `ci` | Biome |
 | `bun run typecheck` | `tsc --noEmit` |
 | `bun run test` | Bun tests |
-| `bun run verify` | ci + typecheck + build |
+| `bun run storybook` | Storybook dev (port 6006) |
+| `bun run build-storybook` | Static Storybook build |
+| `bun run verify` | tokens, ci, typecheck, test, kitbash build, Storybook build |
 
 ## Theming (light / dark)
 

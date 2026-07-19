@@ -1,0 +1,28 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundation/Introduction" />
+
+# @ktbsh/ui
+
+Framework-agnostic design system built with **@ktbsh/sdk** (vanilla custom elements + React wrappers).
+
+## Themes
+
+Use the **Theme** toolbar control (Light / Dark). It sets `data-theme` on `<html>` and loads semantic CSS variables from:
+
+- `src/tokens/themes/light.css` — default light via `:root`
+- `src/tokens/themes/dark.css` — `:root[data-theme="dark"]`
+
+Source of truth for values: `src/tokens/semantic.ts` (`bun run tokens:build`).
+
+## Accessibility
+
+Target: **WCAG 2.2 AA**. See repo `docs/a11y.md`. Stories use the **a11y** addon (axe). Prefer keyboard navigation when exploring components.
+
+## Consume outside Storybook
+
+```bash
+bun run build
+```
+
+Import `dist/vanilla/<name>.js` or React wrappers under `dist/react/`.
