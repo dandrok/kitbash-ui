@@ -79,11 +79,13 @@ export default defineComponent({
 
         nodes.forEach((node, i) => {
           const li = document.createElement('li');
+          li.setAttribute('part', 'breadcrumb-item');
           li.appendChild(node.cloneNode(true));
           list.appendChild(li);
           if (i < nodes.length - 1) {
             const sep = document.createElement('li');
             sep.className = 'sep';
+            sep.setAttribute('part', 'breadcrumb-separator');
             sep.setAttribute('aria-hidden', 'true');
             sep.textContent = '/';
             list.appendChild(sep);
