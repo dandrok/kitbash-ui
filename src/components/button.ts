@@ -34,7 +34,7 @@ export default defineComponent({
         part="button-root"
         class=${props.variant}
         ?disabled=${props.disabled}
-        onclick=${() => setState({ clickCount: state.clickCount + 1 })}
+        onclick=${() => setState({ clickCount: Number(state.clickCount) + 1 })}
       >
         <slot></slot>
         (Clicked: ${state.clickCount})
