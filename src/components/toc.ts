@@ -13,8 +13,8 @@ import { defineComponent } from '@ktbsh/sdk';
  * ```
  *
  * Links are cloned into the shadow tree (nested by `data-depth`), scroll-spy
- * highlights the active section, and active rows show a `>` marker + accent
- * border (token-driven for default + terminal).
+ * highlights the active section, and active rows use a short first-line
+ * accent bar (no terminal `>` — tall multi-line rails look noisy).
  *
  * Section targets: any element with matching `id` (native `h2`–`h4` or
  * host elements such as `kitbash-heading`). Nested rows stay collapsed until
@@ -49,7 +49,10 @@ export default defineComponent({
         __kbTocCleanup?: () => void;
         __kbTocSig?: string;
         __kbTocActiveId?: string;
-        __kbTocScrollEnd?: () => void;
+        __kbTocScrollEnd?: (ev?: Event) => void;
+        __kbTocScroller?: HTMLElement;
+        __kbTocMarginEl?: HTMLElement;
+        __kbTocMarginPrev?: string;
       };
       const list = root.querySelector('.toc-root') as HTMLUListElement | null;
       if (!list || !host) return;
@@ -113,9 +116,36 @@ export default defineComponent({
         return Number.isFinite(n) && n >= 0 ? n : 100;
       };
 
+      /** Nearest scrollport for a target (Storybook iframe / nested overflow). */
+      const scrollParentOf = (el: HTMLElement): HTMLElement => {
+        let p: HTMLElement | null = el.parentElement;
+        while (p && p !== document.documentElement) {
+          const st = getComputedStyle(p);
+          const oy = st.overflowY;
+          const canScroll =
+            (oy === 'auto' || oy === 'scroll' || oy === 'overlay') &&
+            p.scrollHeight > p.clientHeight + 1;
+          if (canScroll) return p;
+          p = p.parentElement;
+        }
+        return (
+          (document.scrollingElement as HTMLElement | null) ||
+          document.documentElement
+        );
+      };
+
       const scrollRoot = () =>
         (document.scrollingElement as HTMLElement | null) ||
         document.documentElement;
+
+      const isDocumentScroller = (scroller: HTMLElement) =>
+        scroller === document.documentElement || scroller === document.body;
+
+      /** Viewport Y of the scroller's content top (0 for the document). */
+      const scrollportTopOf = (scroller: HTMLElement) =>
+        isDocumentScroller(scroller)
+          ? 0
+          : scroller.getBoundingClientRect().top + scroller.clientTop;
 
       /** Highlight only when active id changes — stops open/close flicker. */
       const updateActive = (id: string | null | undefined) => {
@@ -164,18 +194,22 @@ export default defineComponent({
         const offset = stickyOffset();
         // Hysteresis band: avoid flip-flop when a heading sits on the line
         const band = 8;
-        const scroller = scrollRoot();
+        const scroller = listH[0] ? scrollParentOf(listH[0]) : scrollRoot();
         const scrollH = scroller.scrollHeight;
-        const viewH = window.innerHeight;
+        const viewH = isDocumentScroller(scroller)
+          ? window.innerHeight
+          : scroller.clientHeight;
         const scrollTop = scroller.scrollTop;
+        const portTop = scrollportTopOf(scroller);
         const atBottom =
           scrollH > viewH + 10 && viewH + scrollTop >= scrollH - 10;
         if (atBottom) {
           activeId = listH[listH.length - 1]?.id;
         } else {
-          // Last section whose top has crossed (offset + band)
+          // Last section past the scrollport sticky line (viewport coords)
+          const line = portTop + offset + band;
           for (const heading of listH) {
-            if (heading.getBoundingClientRect().top < offset + band) {
+            if (heading.getBoundingClientRect().top < line) {
               activeId = heading.id;
             } else break;
           }
@@ -235,15 +269,34 @@ export default defineComponent({
         };
         appendItems(tree, list, false);
 
+        const restoreScrollMargin = () => {
+          if (host.__kbTocMarginEl) {
+            host.__kbTocMarginEl.style.scrollMarginTop =
+              host.__kbTocMarginPrev ?? '';
+            host.__kbTocMarginEl = undefined;
+            host.__kbTocMarginPrev = undefined;
+          }
+        };
+
+        const clearScrollEnd = () => {
+          if (host.__kbTocScrollEnd) {
+            host.__kbTocScroller?.removeEventListener(
+              'scrollend',
+              host.__kbTocScrollEnd,
+            );
+            window.removeEventListener('scrollend', host.__kbTocScrollEnd);
+            host.__kbTocScrollEnd = undefined;
+            host.__kbTocScroller = undefined;
+          }
+        };
+
         const endManual = () => {
           if (host.__kbTocManualT) {
             clearTimeout(host.__kbTocManualT);
             host.__kbTocManualT = undefined;
           }
-          if (host.__kbTocScrollEnd) {
-            window.removeEventListener('scrollend', host.__kbTocScrollEnd);
-            host.__kbTocScrollEnd = undefined;
-          }
+          clearScrollEnd();
+          restoreScrollMargin();
           host.__kbTocManual = false;
           scanActive();
         };
@@ -255,25 +308,36 @@ export default defineComponent({
             typeof matchMedia === 'function' &&
             matchMedia('(prefers-reduced-motion: reduce)').matches;
           const offset = stickyOffset();
-          const scroller = scrollRoot();
-          const desired =
-            scroller.scrollTop + target.getBoundingClientRect().top - offset;
-          const top = Math.max(0, desired);
+          const scroller = scrollParentOf(target);
+          const portTop = scrollportTopOf(scroller);
           const behavior: ScrollBehavior = reduce ? 'auto' : 'smooth';
 
-          scroller.scrollTo({ top, behavior });
+          // Abort any prior scroll-margin mutation before applying a new one
+          restoreScrollMargin();
+          host.__kbTocMarginPrev = target.style.scrollMarginTop;
+          host.__kbTocMarginEl = target;
+          // scroll-margin: browser lands under sticky chrome (Storybook + site)
+          target.style.scrollMarginTop = `${offset}px`;
 
-          // Snap correction after settle (smooth scroll often lands a few px off)
+          const desiredTop =
+            scroller.scrollTop +
+            target.getBoundingClientRect().top -
+            portTop -
+            offset;
+          const top = Math.max(0, desiredTop);
+
           let settled = false;
           const settle = () => {
             if (settled) return;
             settled = true;
+            restoreScrollMargin();
             if (!host.isConnected || !target.isConnected) {
               endManual();
               return;
             }
-            const err = target.getBoundingClientRect().top - offset;
-            if (Math.abs(err) > 2) {
+            // Quiet correction if still off (no second smooth animation)
+            const err = target.getBoundingClientRect().top - portTop - offset;
+            if (Math.abs(err) > 4) {
               scroller.scrollTop = Math.max(0, scroller.scrollTop + err);
             }
             if (
@@ -292,19 +356,40 @@ export default defineComponent({
             endManual();
           };
 
-          if (host.__kbTocScrollEnd) {
-            window.removeEventListener('scrollend', host.__kbTocScrollEnd);
+          const dist = Math.abs(
+            target.getBoundingClientRect().top - portTop - offset,
+          );
+          // Already in place — no scroll, no scrollend; unlock immediately
+          if (dist < 4) {
+            try {
+              history.replaceState(null, '', `#${id}`);
+            } catch {
+              /* ignore */
+            }
+            settle();
+            return;
           }
-          // Prefer scrollend when available; fallback timeout scales with distance
+
+          try {
+            target.scrollIntoView({ behavior, block: 'start' });
+          } catch {
+            scroller.scrollTo({ top, behavior });
+          }
+
+          clearScrollEnd();
           if (!reduce && 'onscrollend' in window) {
             const onEnd = () => settle();
             host.__kbTocScrollEnd = onEnd;
+            host.__kbTocScroller = scroller;
+            // Either nested scroller or window may be what actually moved
+            scroller.addEventListener('scrollend', onEnd, { once: true });
             window.addEventListener('scrollend', onEnd, { once: true });
-            // Safety if scrollend never fires (no movement / some engines)
-            host.__kbTocManualT = setTimeout(settle, 1200);
+            host.__kbTocManualT = setTimeout(settle, 900);
           } else {
-            const dist = Math.abs(scroller.scrollTop - top);
-            const wait = reduce ? 0 : Math.min(1200, Math.max(200, dist * 0.5));
+            const travel = Math.abs(scroller.scrollTop - top);
+            const wait = reduce
+              ? 0
+              : Math.min(900, Math.max(120, travel * 0.4));
             host.__kbTocManualT = setTimeout(settle, wait);
           }
 
@@ -329,10 +414,8 @@ export default defineComponent({
               clearTimeout(host.__kbTocManualT);
               host.__kbTocManualT = undefined;
             }
-            if (host.__kbTocScrollEnd) {
-              window.removeEventListener('scrollend', host.__kbTocScrollEnd);
-              host.__kbTocScrollEnd = undefined;
-            }
+            clearScrollEnd();
+            restoreScrollMargin();
             updateActive(id);
             scrollToSlug(id);
           });
@@ -340,8 +423,8 @@ export default defineComponent({
       }
 
       /**
-       * Window scroll spy. No CE disconnected hook — rAF-throttle + watchdog
-       * self-clean (sdk-feedback P0 lifecycle).
+       * Scroll spy (capture so nested overflow scrollports are seen — Storybook).
+       * No CE disconnected hook — rAF-throttle + watchdog (sdk-feedback P0).
        */
       if (!host.__kbTocBound) {
         host.__kbTocBound = true;
@@ -363,10 +446,21 @@ export default defineComponent({
         host.__kbTocCleanup = () => {
           if (!host.__kbTocBound) return;
           host.__kbTocBound = false;
-          window.removeEventListener('scroll', onScroll);
+          window.removeEventListener('scroll', onScroll, true);
           if (host.__kbTocScrollEnd) {
+            host.__kbTocScroller?.removeEventListener(
+              'scrollend',
+              host.__kbTocScrollEnd,
+            );
             window.removeEventListener('scrollend', host.__kbTocScrollEnd);
             host.__kbTocScrollEnd = undefined;
+            host.__kbTocScroller = undefined;
+          }
+          if (host.__kbTocMarginEl) {
+            host.__kbTocMarginEl.style.scrollMarginTop =
+              host.__kbTocMarginPrev ?? '';
+            host.__kbTocMarginEl = undefined;
+            host.__kbTocMarginPrev = undefined;
           }
           if (host.__kbTocRaf) {
             cancelAnimationFrame(host.__kbTocRaf);
@@ -386,7 +480,11 @@ export default defineComponent({
           host.__kbTocActiveId = undefined;
           host.__kbTocSig = undefined;
         };
-        window.addEventListener('scroll', onScroll, { passive: true });
+        // capture: true — nested scroll containers do not bubble scroll events
+        window.addEventListener('scroll', onScroll, {
+          passive: true,
+          capture: true,
+        });
         host.__kbTocWatch = setInterval(() => {
           if (!host.isConnected) host.__kbTocCleanup?.();
         }, 2000);
@@ -444,8 +542,7 @@ export default defineComponent({
       padding: 0;
     }
     .toc-root {
-      /* Room for active \`>\` marker without clipping */
-      padding-left: 0.75rem;
+      padding-left: 0;
     }
     .toc-sublist {
       margin: var(--kb-space-2xs) 0 var(--kb-space-2xs) var(--kb-space-sm);
@@ -460,19 +557,16 @@ export default defineComponent({
     }
     .toc-link {
       position: relative;
-      display: flex;
-      align-items: center;
+      display: block;
       box-sizing: border-box;
       min-height: 1.5rem;
-      padding: var(--kb-space-xs) var(--kb-space-sm);
+      padding: var(--kb-space-xs) var(--kb-space-sm) var(--kb-space-xs)
+        calc(var(--kb-space-sm) + 0.35rem);
       margin: 0;
-      border-left: 2px solid transparent;
       color: var(--kb-color-fg-muted);
       text-decoration: none;
       line-height: var(--kb-line-height-normal);
-      transition:
-        color 0.15s ease,
-        border-color 0.15s ease;
+      transition: color 0.15s ease;
     }
     .toc-link--sub {
       font-size: var(--kb-font-size-sm);
@@ -487,15 +581,23 @@ export default defineComponent({
     }
     .toc-link.active {
       color: var(--kb-color-fg-default);
-      border-left-color: var(--kb-color-accent-default);
       font-weight: var(--kb-font-weight-medium);
     }
+    /*
+     * Active cue: short accent bar on the first line only (no \`>\`).
+     * Full-height border + chevron looked like a tall \`>|\` on wrapped titles.
+     */
     .toc-link.active::before {
-      content: '>';
+      content: '';
       position: absolute;
-      left: -0.65rem;
-      color: var(--kb-color-accent-default);
-      font-weight: var(--kb-font-weight-semibold);
+      left: 0;
+      top: var(--kb-space-xs);
+      width: 2px;
+      /* One line of text — does not grow with multi-line titles */
+      height: 1.15em;
+      border-radius: 1px;
+      background: var(--kb-color-accent-default);
+      pointer-events: none;
     }
     slot {
       display: none;

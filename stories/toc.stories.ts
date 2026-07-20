@@ -15,7 +15,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'In-page TOC from light-DOM heading links (`href` + `data-depth`). Clones links into a nested list, scroll-spies section ids (native headings or CE hosts), and marks the active row with `>` + accent border. Nested rows open along the active path.',
+          'In-page TOC from light-DOM heading links (`href` + `data-depth`). Clones links into a nested list, scroll-spies section ids, and marks the active row with a short first-line accent bar. Nested rows open along the active path. Set `--kb-toc-offset` (px, unitless) for sticky headers.',
       },
     },
     layout: 'fullscreen',
@@ -48,9 +48,17 @@ const sections = [
 export const BlogStyle: Story = {
   render: () => html`
     <div
-      style="display: grid; grid-template-columns: 16rem 1fr; gap: 2rem; max-width: 56rem; margin: 0 auto; padding: 2rem 1rem 8rem;"
+      style="display: grid; grid-template-columns: 16rem 1fr; gap: 2rem; max-width: 56rem; margin: 0 auto; padding: 1.5rem 1rem 8rem;"
     >
-      <kitbash-toc label="// Contents" sticky>
+      <!--
+        Storybook has no site header: use a small offset so click-scroll lands
+        on the heading (site should set --kb-toc-offset to header height).
+      -->
+      <kitbash-toc
+        label="// Contents"
+        sticky
+        style="--kb-toc-offset: 16; top: 1rem;"
+      >
         ${sections.map(
           (s) => html`
             <a href=${`#${s.id}`} data-depth=${String(s.depth)}>${s.title}</a>
