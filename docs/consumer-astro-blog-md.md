@@ -57,7 +57,7 @@ Consumers load **all** theme CSS they need; preset + theme attributes select whi
 | TagList | tag chips | `kitbash-badge` (close) | polish / optional `tag` later |
 | BlogList / BlogPostPreview | list + cards | layout + `heading`/`text`/`link` | compose; optional `card` later |
 | Pagination | page nav | **`kitbash-pagination`** | wire in site |
-| TableOfContents | in-page nav | `nav` / links | compose; optional later |
+| TableOfContents | in-page nav | **`kitbash-toc`** (light-DOM links + scroll-spy) | shipped |
 | Prose | markdown body styles | **missing** (`prose` recipe or CSS) | later |
 | TerminalTitle | decorative title | `heading` + styles | compose |
 | PulseCursor | decorative caret | decorative only | site-specific CSS ok |
@@ -73,9 +73,9 @@ Consumers load **all** theme CSS they need; preset + theme attributes select whi
 ## Phased work (slow)
 
 1. [x] **Themes** — terminal preset + preset API + Storybook axes (PR #15).  
-2. [ ] **Blog chrome** — theme/preset toggles, toggle-group, scroll-top.  
+2. [x] **Blog chrome** — theme/preset toggles, toggle-group, scroll-top (PR #17).  
 3. [ ] **Visual parity pass** — tokens/spacing vs regular-ui + terminal under 4 combos.  
-4. [ ] **Gap components** — TOC / sticky nav, prose, tag polish, cards.  
+4. [ ] **Gap components** — prose, tag polish, cards (`kitbash-toc` shipped this wave).  
 5. [ ] **Site integration** (separate repo / expanded boundary) — swap Astro pieces one by one.
 
 ---
