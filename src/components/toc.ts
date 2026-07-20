@@ -47,6 +47,9 @@ export default defineComponent({
         __kbTocWatch?: ReturnType<typeof setInterval>;
         __kbTocHeadings?: HTMLElement[];
         __kbTocCleanup?: () => void;
+        __kbTocSig?: string;
+        __kbTocActiveId?: string;
+        __kbTocScrollEnd?: () => void;
       };
       const list = root.querySelector('.toc-root') as HTMLUListElement | null;
       if (!list || !host) return;
@@ -72,98 +75,20 @@ export default defineComponent({
         flats.push({ text, slug, depth });
       }
 
-      const tree: Node[] = [];
-      const stack: Node[] = [];
-      for (const h of flats) {
-        const item: Node = { ...h, children: [] };
-        while (stack.length > 0 && h.depth <= stack[stack.length - 1].depth) {
-          stack.pop();
-        }
-        if (stack.length > 0) stack[stack.length - 1].children.push(item);
-        else tree.push(item);
-        stack.push(item);
-      }
-
-      while (list.firstChild) list.removeChild(list.firstChild);
-
-      const makeLink = (item: Node, isSub: boolean) => {
-        const a = document.createElement('a');
-        a.className = isSub ? 'toc-link toc-link--sub' : 'toc-link';
-        a.href = `#${item.slug}`;
-        a.dataset.slug = item.slug;
-        a.textContent = item.text;
-        a.part.add('toc-link');
-        a.part.add(isSub ? 'toc-link-sub' : 'toc-link-main');
-        return a;
-      };
-
-      const appendItems = (
-        items: Node[],
-        ul: HTMLUListElement,
-        isSub: boolean,
-      ) => {
-        for (const item of items) {
-          const li = document.createElement('li');
-          li.className = 'toc-item';
-          li.part.add('toc-item');
-          li.appendChild(makeLink(item, isSub));
-          if (item.children.length > 0) {
-            const sub = document.createElement('ul');
-            sub.className = 'toc-sublist';
-            sub.part.add('toc-sublist');
-            appendItems(item.children, sub, true);
-            li.appendChild(sub);
-          }
-          ul.appendChild(li);
-        }
-      };
-      appendItems(tree, list, false);
+      // Skip full rebuild when light-DOM links did not change (avoids thrash
+      // when frameworks re-render the same anchors and re-fire slotchange).
+      const sig = flats
+        .map((f) => `${f.slug}\0${f.depth}\0${f.text}`)
+        .join('\n');
+      const structureChanged =
+        host.__kbTocSig !== sig || list.childNodes.length === 0;
+      host.__kbTocSig = sig;
 
       const slugSet = new Set(flats.map((f) => f.slug));
-
-      /** Highlight link, expand nested path (parent + own children). */
-      const updateActive = (id: string | null | undefined) => {
-        if (!id) return;
-        const links = Array.from(
-          list.querySelectorAll('a.toc-link'),
-        ) as HTMLAnchorElement[];
-        let found: HTMLAnchorElement | undefined;
-        for (const a of links) {
-          const on = a.dataset.slug === id;
-          a.classList.toggle('active', on);
-          if (on) {
-            a.setAttribute('aria-current', 'location');
-            found = a;
-          } else {
-            a.removeAttribute('aria-current');
-          }
-        }
-
-        // Collapse all nested lists, then open path to active + its own kids
-        list.querySelectorAll('.toc-sublist').forEach((sub) => {
-          (sub as HTMLElement).classList.remove('is-open');
-        });
-        if (!found) return;
-
-        // 1) Open every ancestor sublist (so nested h3 under h2 is visible)
-        let el: HTMLElement | null = found.parentElement;
-        while (el && el !== list) {
-          if (el.classList.contains('toc-sublist')) {
-            el.classList.add('is-open');
-          }
-          el = el.parentElement;
-        }
-
-        // 2) If active row has children, open that sublist too (blog group-open)
-        const li = found.closest('li.toc-item');
-        const ownSub = li?.querySelector(':scope > .toc-sublist');
-        if (ownSub) ownSub.classList.add('is-open');
-      };
 
       /**
        * Resolve section targets by id (document order). Supports native
        * headings and CE hosts that carry the id (e.g. kitbash-heading).
-       * Cached on slot sync to avoid re-query + sort on every scroll tick.
        */
       const resolveHeadings = () => {
         const found: HTMLElement[] = [];
@@ -179,8 +104,6 @@ export default defineComponent({
         });
         return found;
       };
-      const headings = resolveHeadings();
-      host.__kbTocHeadings = headings;
 
       const stickyOffset = () => {
         const raw = getComputedStyle(host)
@@ -190,25 +113,69 @@ export default defineComponent({
         return Number.isFinite(n) && n >= 0 ? n : 100;
       };
 
+      const scrollRoot = () =>
+        (document.scrollingElement as HTMLElement | null) ||
+        document.documentElement;
+
+      /** Highlight only when active id changes — stops open/close flicker. */
+      const updateActive = (id: string | null | undefined) => {
+        if (!id || id === host.__kbTocActiveId) return;
+        host.__kbTocActiveId = id;
+        const links = Array.from(
+          list.querySelectorAll('a.toc-link'),
+        ) as HTMLAnchorElement[];
+        let found: HTMLAnchorElement | undefined;
+        for (const a of links) {
+          const on = a.dataset.slug === id;
+          a.classList.toggle('active', on);
+          if (on) {
+            a.setAttribute('aria-current', 'location');
+            found = a;
+          } else {
+            a.removeAttribute('aria-current');
+          }
+        }
+
+        list.querySelectorAll('.toc-sublist').forEach((sub) => {
+          (sub as HTMLElement).classList.remove('is-open');
+        });
+        if (!found) return;
+
+        let el: HTMLElement | null = found.parentElement;
+        while (el && el !== list) {
+          if (el.classList.contains('toc-sublist')) {
+            el.classList.add('is-open');
+          }
+          el = el.parentElement;
+        }
+
+        const li = found.closest('li.toc-item');
+        const ownSub = li?.querySelector(':scope > .toc-sublist');
+        if (ownSub) ownSub.classList.add('is-open');
+      };
+
       const scanActive = () => {
         if (!host.isConnected) return;
         if (host.__kbTocManual) return;
-        const listH = host.__kbTocHeadings || headings;
-        if (listH.length === 0) return;
+        const listH = host.__kbTocHeadings;
+        if (!listH || listH.length === 0) return;
 
         let activeId = listH[0]?.id;
         const offset = stickyOffset();
-        const scrollH = document.documentElement.scrollHeight;
+        // Hysteresis band: avoid flip-flop when a heading sits on the line
+        const band = 8;
+        const scroller = scrollRoot();
+        const scrollH = scroller.scrollHeight;
         const viewH = window.innerHeight;
-        // Only treat as “bottom” when the page can actually scroll
+        const scrollTop = scroller.scrollTop;
         const atBottom =
-          scrollH > viewH + 10 && viewH + window.scrollY >= scrollH - 10;
+          scrollH > viewH + 10 && viewH + scrollTop >= scrollH - 10;
         if (atBottom) {
           activeId = listH[listH.length - 1]?.id;
         } else {
-          // Last section whose top is above sticky-header threshold
+          // Last section whose top has crossed (offset + band)
           for (const heading of listH) {
-            if (heading.getBoundingClientRect().top < offset) {
+            if (heading.getBoundingClientRect().top < offset + band) {
               activeId = heading.id;
             } else break;
           }
@@ -217,66 +184,164 @@ export default defineComponent({
       };
 
       host.__kbTocScroll = scanActive;
+      host.__kbTocHeadings = resolveHeadings();
 
-      const scrollToSlug = (id: string) => {
-        const target = document.getElementById(id);
-        if (!target) return;
-        const reduce =
-          typeof matchMedia === 'function' &&
-          matchMedia('(prefers-reduced-motion: reduce)').matches;
-        const offset = stickyOffset();
-        const top =
-          target.getBoundingClientRect().top + window.scrollY - offset;
-        window.scrollTo({
-          top: Math.max(0, top),
-          behavior: reduce ? 'auto' : 'smooth',
-        });
-        // Move focus for keyboard / AT (skip if already focusable control)
-        if (
-          !target.hasAttribute('tabindex') &&
-          !target.matches(
-            'a, button, input, select, textarea, [contenteditable="true"]',
-          )
-        ) {
-          target.setAttribute('tabindex', '-1');
+      if (structureChanged) {
+        const tree: Node[] = [];
+        const stack: Node[] = [];
+        for (const h of flats) {
+          const item: Node = { ...h, children: [] };
+          while (stack.length > 0 && h.depth <= stack[stack.length - 1].depth) {
+            stack.pop();
+          }
+          if (stack.length > 0) stack[stack.length - 1].children.push(item);
+          else tree.push(item);
+          stack.push(item);
         }
-        try {
-          target.focus({ preventScroll: true });
-        } catch {
-          /* ignore non-focusable hosts in old engines */
-        }
-        try {
-          history.replaceState(null, '', `#${id}`);
-        } catch {
-          /* ignore */
-        }
-      };
 
-      // Click: scroll to heading id, highlight, open under-tags, pause spy
-      const links = Array.from(
-        list.querySelectorAll('a.toc-link'),
-      ) as HTMLAnchorElement[];
-      for (const a of links) {
-        a.addEventListener('click', (ev: Event) => {
-          const id = a.dataset.slug;
-          if (!id) return;
-          ev.preventDefault();
-          host.__kbTocManual = true;
-          if (host.__kbTocManualT) clearTimeout(host.__kbTocManualT);
-          updateActive(id);
-          scrollToSlug(id);
-          host.__kbTocManualT = setTimeout(() => {
-            if (!host.isConnected) return;
-            host.__kbTocManual = false;
-            scanActive();
-          }, 1000);
-        });
+        while (list.firstChild) list.removeChild(list.firstChild);
+        host.__kbTocActiveId = undefined;
+
+        const makeLink = (item: Node, isSub: boolean) => {
+          const a = document.createElement('a');
+          a.className = isSub ? 'toc-link toc-link--sub' : 'toc-link';
+          a.href = `#${item.slug}`;
+          a.dataset.slug = item.slug;
+          a.textContent = item.text;
+          a.part.add('toc-link');
+          a.part.add(isSub ? 'toc-link-sub' : 'toc-link-main');
+          return a;
+        };
+
+        const appendItems = (
+          items: Node[],
+          ul: HTMLUListElement,
+          isSub: boolean,
+        ) => {
+          for (const item of items) {
+            const li = document.createElement('li');
+            li.className = 'toc-item';
+            li.part.add('toc-item');
+            li.appendChild(makeLink(item, isSub));
+            if (item.children.length > 0) {
+              const sub = document.createElement('ul');
+              sub.className = 'toc-sublist';
+              sub.part.add('toc-sublist');
+              appendItems(item.children, sub, true);
+              li.appendChild(sub);
+            }
+            ul.appendChild(li);
+          }
+        };
+        appendItems(tree, list, false);
+
+        const endManual = () => {
+          if (host.__kbTocManualT) {
+            clearTimeout(host.__kbTocManualT);
+            host.__kbTocManualT = undefined;
+          }
+          if (host.__kbTocScrollEnd) {
+            window.removeEventListener('scrollend', host.__kbTocScrollEnd);
+            host.__kbTocScrollEnd = undefined;
+          }
+          host.__kbTocManual = false;
+          scanActive();
+        };
+
+        const scrollToSlug = (id: string) => {
+          const target = document.getElementById(id);
+          if (!target) return;
+          const reduce =
+            typeof matchMedia === 'function' &&
+            matchMedia('(prefers-reduced-motion: reduce)').matches;
+          const offset = stickyOffset();
+          const scroller = scrollRoot();
+          const desired =
+            scroller.scrollTop + target.getBoundingClientRect().top - offset;
+          const top = Math.max(0, desired);
+          const behavior: ScrollBehavior = reduce ? 'auto' : 'smooth';
+
+          scroller.scrollTo({ top, behavior });
+
+          // Snap correction after settle (smooth scroll often lands a few px off)
+          let settled = false;
+          const settle = () => {
+            if (settled) return;
+            settled = true;
+            if (!host.isConnected || !target.isConnected) {
+              endManual();
+              return;
+            }
+            const err = target.getBoundingClientRect().top - offset;
+            if (Math.abs(err) > 2) {
+              scroller.scrollTop = Math.max(0, scroller.scrollTop + err);
+            }
+            if (
+              !target.hasAttribute('tabindex') &&
+              !target.matches(
+                'a, button, input, select, textarea, [contenteditable="true"]',
+              )
+            ) {
+              target.setAttribute('tabindex', '-1');
+            }
+            try {
+              target.focus({ preventScroll: true });
+            } catch {
+              /* ignore */
+            }
+            endManual();
+          };
+
+          if (host.__kbTocScrollEnd) {
+            window.removeEventListener('scrollend', host.__kbTocScrollEnd);
+          }
+          // Prefer scrollend when available; fallback timeout scales with distance
+          if (!reduce && 'onscrollend' in window) {
+            const onEnd = () => settle();
+            host.__kbTocScrollEnd = onEnd;
+            window.addEventListener('scrollend', onEnd, { once: true });
+            // Safety if scrollend never fires (no movement / some engines)
+            host.__kbTocManualT = setTimeout(settle, 1200);
+          } else {
+            const dist = Math.abs(scroller.scrollTop - top);
+            const wait = reduce ? 0 : Math.min(1200, Math.max(200, dist * 0.5));
+            host.__kbTocManualT = setTimeout(settle, wait);
+          }
+
+          try {
+            history.replaceState(null, '', `#${id}`);
+          } catch {
+            /* ignore */
+          }
+        };
+
+        // Click: pin active row, scroll, hold spy until settle
+        const links = Array.from(
+          list.querySelectorAll('a.toc-link'),
+        ) as HTMLAnchorElement[];
+        for (const a of links) {
+          a.addEventListener('click', (ev: Event) => {
+            const id = a.dataset.slug;
+            if (!id) return;
+            ev.preventDefault();
+            host.__kbTocManual = true;
+            if (host.__kbTocManualT) {
+              clearTimeout(host.__kbTocManualT);
+              host.__kbTocManualT = undefined;
+            }
+            if (host.__kbTocScrollEnd) {
+              window.removeEventListener('scrollend', host.__kbTocScrollEnd);
+              host.__kbTocScrollEnd = undefined;
+            }
+            updateActive(id);
+            scrollToSlug(id);
+          });
+        }
       }
 
       /**
-       * Window scroll spy (blog-style offset math). No CE disconnected hook —
-       * rAF-throttle + interval watchdog self-clean when host leaves the DOM
-       * (SPA navigations that never scroll again). See sdk-feedback P0 lifecycle.
+       * Window scroll spy. No CE disconnected hook — rAF-throttle + watchdog
+       * self-clean (sdk-feedback P0 lifecycle).
        */
       if (!host.__kbTocBound) {
         host.__kbTocBound = true;
@@ -299,6 +364,10 @@ export default defineComponent({
           if (!host.__kbTocBound) return;
           host.__kbTocBound = false;
           window.removeEventListener('scroll', onScroll);
+          if (host.__kbTocScrollEnd) {
+            window.removeEventListener('scrollend', host.__kbTocScrollEnd);
+            host.__kbTocScrollEnd = undefined;
+          }
           if (host.__kbTocRaf) {
             cancelAnimationFrame(host.__kbTocRaf);
             host.__kbTocRaf = undefined;
@@ -314,6 +383,8 @@ export default defineComponent({
           host.__kbTocScroll = undefined;
           host.__kbTocHeadings = undefined;
           host.__kbTocCleanup = undefined;
+          host.__kbTocActiveId = undefined;
+          host.__kbTocSig = undefined;
         };
         window.addEventListener('scroll', onScroll, { passive: true });
         host.__kbTocWatch = setInterval(() => {
