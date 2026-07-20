@@ -25,7 +25,8 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 - [x] **Form control visuals** — custom checkbox/radio/switch/select + dark skeleton (PR #18)
 - [x] **Theme presets (astro-blog-md)** — terminal + default light/dark (PR #15, npm 0.2.0)
 - [x] **npm first release** — publish workflow + operator release
-- [ ] **Next** — visual token parity, TOC/sticky nav, prose, then site integration
+- [ ] **Table of contents** — `kitbash-toc` (`feat/toc`)
+- [ ] **Next** — visual token parity, prose, then site integration
 - [ ] ~~Default branch rename `master` → `main`~~ — optional; skip unless desired
 
 ## Standing requirements (every component PR)

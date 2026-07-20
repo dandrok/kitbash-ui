@@ -40,6 +40,7 @@ describe('primitive components', () => {
       'preset-toggle.ts',
       'toggle-group.ts',
       'scroll-top.ts',
+      'toc.ts',
     ]) {
       expect(files.includes(name), name).toBe(true);
     }
