@@ -73,13 +73,18 @@ export const BlogTags: Story = {
     variant: 'tag',
     hash: true,
   },
-  render: () => {
+  render: (args) => {
     const tags = ['react', 'hooks', 'typescript', 'astro', 'css'];
     return html`
       <kitbash-stack direction="row" gap="sm" wrap>
         ${tags.map(
           (t) => html`
-            <kitbash-badge variant="tag" tone="accent" hash>${t}</kitbash-badge>
+            <kitbash-badge
+              variant=${args.variant}
+              tone=${args.tone}
+              ?hash=${args.hash}
+              >${t}</kitbash-badge
+            >
           `,
         )}
       </kitbash-stack>
