@@ -26,7 +26,7 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 - [x] **Theme presets (astro-blog-md)** — terminal + default light/dark (PR #15, npm 0.2.0)
 - [x] **npm first release** — publish workflow + operator release
 - [x] **Table of contents** — `kitbash-toc` (PR #20)
-- [ ] **Tag polish** — blog `TagList` via `kitbash-badge` `variant="tag"` (`feat/tag-polish`)
+- [ ] **Tags** — `kitbash-tag` + `kitbash-tag-list` (blog TagList 1:1) (`feat/tag-polish`)
 - [ ] **Next** — visual token parity, prose, cards, then site integration
 - [ ] ~~Default branch rename `master` → `main`~~ — optional; skip unless desired
 
