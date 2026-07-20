@@ -81,6 +81,8 @@ export const semanticTokens = {
       'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
     dark: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
   },
+  /* xs = Tailwind text-xs (blog TagList) */
+  'font-size-xs': { light: '0.75rem', dark: '0.75rem' },
   'font-size-sm': { light: '0.875rem', dark: '0.875rem' },
   'font-size-md': { light: '1rem', dark: '1rem' },
   'font-size-lg': { light: '1.125rem', dark: '1.125rem' },
