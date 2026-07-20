@@ -8,7 +8,7 @@ const root = resolve(import.meta.dir, '..');
 
 test('package identity is @ktbsh/ui', () => {
   expect(pkg.name).toBe('@ktbsh/ui');
-  expect(pkg.version).toBe('0.3.0');
+  expect(pkg.version).toBe('0.4.0');
 });
 
 test('package.json exposes public export map (dist-only runtime)', () => {
