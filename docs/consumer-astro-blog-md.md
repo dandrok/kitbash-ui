@@ -54,7 +54,7 @@ Consumers load **all** theme CSS they need; preset + theme attributes select whi
 | PageHeader | site header + nav | `kitbash-nav` + layout (`box`/`stack`) | compose, not new CE |
 | Footer | site footer | layout + `text`/`link` | compose |
 | FormattedDate | `<time>` | native / `text` | compose |
-| TagList | tag chips | `kitbash-badge` (close) | polish / optional `tag` later |
+| TagList | tag chips | **`kitbash-badge`** `variant="tag"` + `hash` | shipped (compose list with stack) |
 | BlogList / BlogPostPreview | list + cards | layout + `heading`/`text`/`link` | compose; optional `card` later |
 | Pagination | page nav | **`kitbash-pagination`** | wire in site |
 | TableOfContents | in-page nav | **`kitbash-toc`** (light-DOM links + scroll-spy) | shipped |
@@ -75,7 +75,7 @@ Consumers load **all** theme CSS they need; preset + theme attributes select whi
 1. [x] **Themes** — terminal preset + preset API + Storybook axes (PR #15).  
 2. [x] **Blog chrome** — theme/preset toggles, toggle-group, scroll-top (PR #17).  
 3. [ ] **Visual parity pass** — tokens/spacing vs regular-ui + terminal under 4 combos.  
-4. [ ] **Gap components** — prose, tag polish, cards (`kitbash-toc` shipped this wave).  
+4. [ ] **Gap components** — prose, cards (`kitbash-toc` + tag badge variant shipped).  
 5. [ ] **Site integration** (separate repo / expanded boundary) — swap Astro pieces one by one.
 
 ---

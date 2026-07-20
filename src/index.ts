@@ -30,6 +30,7 @@ export {
 
 export type {
   KitbashBadgeTone,
+  KitbashBadgeVariant,
   KitbashButtonVariant,
   KitbashContainerWidth,
   KitbashFeedbackTone,

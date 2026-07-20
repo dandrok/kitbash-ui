@@ -11,6 +11,9 @@ export type KitbashBadgeTone =
   | 'warning'
   | 'danger';
 
+/** Soft filled pill vs outline tag chip (blog TagList). */
+export type KitbashBadgeVariant = 'soft' | 'tag';
+
 export type KitbashLinkTone = 'default' | 'muted' | 'accent';
 
 /** Spacing token keys used by layout (maps to --kb-space-*). */
