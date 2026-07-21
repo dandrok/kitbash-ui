@@ -34,9 +34,11 @@ export default defineComponent({
       max-width: min(22rem, calc(100vw - 2 * var(--kb-space-lg)));
       box-sizing: border-box;
     }
+    /* Inline: size against containing block (not viewport), like modal */
     :host([open][inline]) {
       position: absolute;
       z-index: 2;
+      max-width: min(22rem, calc(100% - 2 * var(--kb-space-lg)));
     }
     .root {
       display: flex;
@@ -92,7 +94,7 @@ export default defineComponent({
     .body {
       flex: 1;
       min-width: 0;
-      padding-block: 0.1rem;
+      padding-block: var(--kb-space-2xs);
     }
     .title {
       margin: 0 0 var(--kb-space-2xs);

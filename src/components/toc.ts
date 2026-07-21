@@ -542,8 +542,9 @@ export default defineComponent({
       padding: 0;
     }
     .toc-root {
-      /* Room for active \`>\` outside the border-l rail */
-      padding-left: 0.85rem;
+      /* Marker sits outside the border-l rail; keep pad + ::before left in sync */
+      --kb-toc-marker-offset: 0.75rem;
+      padding-left: calc(var(--kb-toc-marker-offset) + 0.1rem);
     }
     .toc-sublist {
       margin: var(--kb-space-2xs) 0 var(--kb-space-2xs) var(--kb-space-sm);
@@ -591,9 +592,10 @@ export default defineComponent({
     }
     /* Blog: .toc-link::before { content: '>'; opacity: 0 } .active { opacity: 1 } */
     .toc-link::before {
-      content: '>';
+      /* Slash alt-text: decorative marker (empty alternative for AT) */
+      content: '>' / '';
       position: absolute;
-      left: -0.75rem;
+      left: calc(-1 * var(--kb-toc-marker-offset));
       top: var(--kb-space-xs);
       line-height: var(--kb-line-height-normal);
       color: var(--kb-color-accent-default);
