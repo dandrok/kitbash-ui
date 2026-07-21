@@ -4,6 +4,9 @@ import { defineComponent } from '@ktbsh/sdk';
  * Progress indicator.
  * - Set `value` 0–100 for determinate bar (`aria-valuenow`).
  * - Omit / empty `value` for indeterminate (still `role="progressbar"`).
+ *
+ * Track/bar use `--kb-radius-*` (square under terminal preset). Fill uses
+ * accent with a subtle glow for CRT / cyberpunk feel.
  */
 export default defineComponent({
   tag: 'kitbash-progress',
@@ -21,33 +24,49 @@ export default defineComponent({
     .track {
       box-sizing: border-box;
       width: 100%;
-      height: 0.5rem;
+      height: 0.65rem;
       overflow: hidden;
-      border-radius: var(--kb-radius-full);
+      border-radius: var(--kb-radius-sm);
       background: var(--kb-color-bg-subtle);
-      border: 1px solid var(--kb-color-border-muted);
+      border: 1px solid var(--kb-color-border-default);
+      box-shadow: inset 0 0 0 1px
+        color-mix(in srgb, var(--kb-color-accent-default) 8%, transparent);
     }
     .bar {
       height: 100%;
-      border-radius: var(--kb-radius-full);
-      background: var(--kb-color-accent-default);
+      border-radius: var(--kb-radius-none);
+      background: linear-gradient(
+        90deg,
+        var(--kb-color-accent-default),
+        color-mix(
+          in srgb,
+          var(--kb-color-accent-default) 70%,
+          var(--kb-color-fg-default)
+        )
+      );
+      box-shadow:
+        0 0 8px
+          color-mix(in srgb, var(--kb-color-accent-default) 45%, transparent),
+        inset 0 0 0 1px
+          color-mix(in srgb, var(--kb-color-fg-on-accent) 15%, transparent);
       transition: width 0.2s ease;
     }
     .indeterminate .bar {
-      width: 40%;
-      animation: kitbash-progress-indeterminate 1.2s ease-in-out infinite;
+      width: 35%;
+      animation: kitbash-progress-indeterminate 1.1s linear infinite;
     }
     @keyframes kitbash-progress-indeterminate {
       0% {
-        transform: translateX(-100%);
+        transform: translateX(-120%);
       }
       100% {
-        transform: translateX(350%);
+        transform: translateX(320%);
       }
     }
     @media (prefers-reduced-motion: reduce) {
       .bar {
         transition: none;
+        box-shadow: none;
       }
       .indeterminate .bar {
         animation: none;

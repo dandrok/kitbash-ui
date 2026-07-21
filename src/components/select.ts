@@ -43,16 +43,16 @@ export default defineComponent({
       border: 1px solid var(--kb-color-border-default);
       border-radius: var(--kb-radius-sm);
       background-color: var(--kb-color-bg-canvas);
-      /* Custom chevron (token-colored); listbox chrome is still browser-native */
+      /* Custom chevron (token-colored) */
       background-image:
         linear-gradient(
           45deg,
           transparent 50%,
-          var(--kb-color-fg-muted) 50%
+          var(--kb-color-accent-default) 50%
         ),
         linear-gradient(
           135deg,
-          var(--kb-color-fg-muted) 50%,
+          var(--kb-color-accent-default) 50%,
           transparent 50%
         ),
         linear-gradient(
@@ -75,12 +75,15 @@ export default defineComponent({
       line-height: var(--kb-line-height-normal);
       cursor: pointer;
       outline: none;
+      /* Tint native popup / OS chrome where supported */
+      accent-color: var(--kb-color-accent-default);
+      color-scheme: light dark;
       transition:
         border-color 0.12s ease,
         box-shadow 0.12s ease;
     }
     select:hover:not(:disabled) {
-      border-color: var(--kb-color-border-focus);
+      border-color: var(--kb-color-accent-default);
     }
     :host([size="sm"]) select {
       min-height: 2rem;
@@ -102,10 +105,25 @@ export default defineComponent({
     select[aria-invalid="true"] {
       border-color: var(--kb-color-danger-default);
     }
+    /*
+     * Option list: browsers only partially honor these (esp. hover).
+     * Colors + flat radius still help terminal/default cohesion where applied.
+     */
     option,
     optgroup {
-      background: var(--kb-color-bg-canvas);
+      background-color: var(--kb-color-bg-canvas);
       color: var(--kb-color-fg-default);
+      font-family: inherit;
+    }
+    option:checked,
+    option:hover,
+    option:focus {
+      background-color: var(--kb-color-accent-subtle);
+      color: var(--kb-color-accent-default);
+    }
+    optgroup {
+      color: var(--kb-color-fg-muted);
+      font-weight: var(--kb-font-weight-semibold);
     }
     /* Light-DOM options are cloned into <select>; keep the source slot out of layout */
     slot {

@@ -2,8 +2,12 @@ import { defineComponent } from '@ktbsh/sdk';
 
 /**
  * Indeterminate loading indicator.
- * A11y: `role="status"` with visually hidden text (more reliable than
- * empty + aria-label alone). Animation reduced under prefers-reduced-motion.
+ *
+ * Square “radar” frame (uses `--kb-radius-sm` → 0 under terminal) with a
+ * rotating accent edge — more technical/CRT than a soft pill ring.
+ *
+ * A11y: `role="status"` + sr-only label. Motion reduced under
+ * prefers-reduced-motion.
  */
 export default defineComponent({
   tag: 'kitbash-spinner',
@@ -21,27 +25,62 @@ export default defineComponent({
       position: relative;
     }
     .root {
+      position: relative;
       display: inline-block;
       box-sizing: border-box;
-      border-radius: var(--kb-radius-full);
-      border-style: solid;
-      border-color: currentColor transparent currentColor transparent;
-      animation: kitbash-spin 0.7s linear infinite;
+      border-radius: var(--kb-radius-sm);
+      border: 2px solid
+        color-mix(in srgb, var(--kb-color-accent-default) 22%, transparent);
+      background: color-mix(
+        in srgb,
+        var(--kb-color-accent-default) 6%,
+        transparent
+      );
+      animation: kitbash-spin 0.85s linear infinite;
+    }
+    /* Leading edge — bright corner sweep */
+    .root::before {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: inherit;
+      border: 2px solid transparent;
+      border-top-color: currentColor;
+      border-right-color: currentColor;
+      box-shadow: 0 0 6px
+        color-mix(in srgb, var(--kb-color-accent-default) 50%, transparent);
+      pointer-events: none;
+    }
+    /* Inner crosshair tick */
+    .root::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 28%;
+      height: 28%;
+      transform: translate(-50%, -50%);
+      border: 1px solid
+        color-mix(in srgb, var(--kb-color-accent-default) 55%, transparent);
+      border-radius: var(--kb-radius-none);
+      background: color-mix(
+        in srgb,
+        var(--kb-color-accent-default) 12%,
+        transparent
+      );
+      pointer-events: none;
     }
     .sm {
       width: 1rem;
       height: 1rem;
-      border-width: 2px;
     }
     .md {
       width: 1.5rem;
       height: 1.5rem;
-      border-width: 2px;
     }
     .lg {
       width: 2.25rem;
       height: 2.25rem;
-      border-width: 3px;
     }
     @keyframes kitbash-spin {
       to {
@@ -51,8 +90,11 @@ export default defineComponent({
     @media (prefers-reduced-motion: reduce) {
       .root {
         animation: none;
+        opacity: 0.85;
+      }
+      .root::before {
         border-color: currentColor;
-        opacity: 0.7;
+        box-shadow: none;
       }
     }
     .sr-only {
