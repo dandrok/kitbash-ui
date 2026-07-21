@@ -69,10 +69,12 @@ export const semanticTokens = {
   'space-xl': { light: '32px', dark: '32px' },
   'space-2xl': { light: '48px', dark: '48px' },
 
-  /* Radius */
+  /* Radius — default = soft UI; terminal preset zeros sm/md/lg for CRT boxes */
+  'radius-none': { light: '0', dark: '0' },
   'radius-sm': { light: '4px', dark: '4px' },
   'radius-md': { light: '8px', dark: '8px' },
   'radius-lg': { light: '12px', dark: '12px' },
+  /** Circles only (radio, spinner). Terminal keeps this pill/circle capable. */
   'radius-full': { light: '9999px', dark: '9999px' },
 
   /* Typography */
