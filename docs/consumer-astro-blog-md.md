@@ -41,6 +41,23 @@ A11y: dashed focus rings, `sr-only`, `prefers-reduced-motion` (CRT flicker off).
 - `default` → existing `themes/light.css` + `themes/dark.css` (current DS; close to “regular” blue/neutral)
 - `terminal` → `themes/terminal/light.css` + `themes/terminal/dark.css` (Matrix values from blog)
 
+**Fonts (blog faces):** load once so stacks resolve (Storybook does this via `themes/fonts.css`):
+
+| Preset | Face | Blog |
+|--------|------|------|
+| terminal | **VT323** | `global.css` Google Fonts import |
+| default | **Inter** (optional) | regular UI |
+
+```ts
+import '@ktbsh/ui/themes/fonts.css'; // VT323 + Inter
+import '@ktbsh/ui/themes/light.css';
+import '@ktbsh/ui/themes/dark.css';
+import '@ktbsh/ui/themes/terminal/light.css';
+import '@ktbsh/ui/themes/terminal/dark.css';
+```
+
+Without `fonts.css`, terminal falls back to `ui-monospace` / Courier (stack still works; less CRT).
+
 Consumers load **all** theme CSS they need; preset + theme attributes select which vars win.
 
 ---

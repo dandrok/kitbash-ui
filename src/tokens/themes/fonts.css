@@ -1,0 +1,20 @@
+/**
+ * Optional web fonts for kitbash presets (blog parity).
+ *
+ * Load once in the app shell / Storybook — **not** injected per component.
+ *
+ * | Preset    | Face   | Blog source                          |
+ * |-----------|--------|--------------------------------------|
+ * | terminal  | VT323  | astro-blog-md global.css @import     |
+ * | default   | Inter  | astro-blog-md regular UI             |
+ *
+ * Terminal CSS already sets:
+ *   --kb-font-family-sans: 'VT323', ui-monospace, 'Courier New', monospace;
+ * Without this file, VT323 is missing and the stack falls back to Courier.
+ */
+
+/* Authentic Matrix / CRT mono (terminal preset) */
+@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+
+/* Modern UI sans (default / “regular” preset) */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');

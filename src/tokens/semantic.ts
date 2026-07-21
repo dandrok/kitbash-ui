@@ -77,11 +77,11 @@ export const semanticTokens = {
   /** Circles only (radio, spinner). Terminal keeps this pill/circle capable. */
   'radius-full': { light: '9999px', dark: '9999px' },
 
-  /* Typography */
+  /* Typography — Inter when fonts.css is loaded (blog regular UI parity) */
   'font-family-sans': {
     light:
-      'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-    dark: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+      'Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+    dark: 'Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
   },
   /* xs = Tailwind text-xs (blog TagList) */
   'font-size-xs': { light: '0.75rem', dark: '0.75rem' },

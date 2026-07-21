@@ -1,5 +1,7 @@
 import type { Preview } from '@storybook/web-components-vite';
 
+// VT323 (terminal) + Inter (default) — same faces as astro-blog-md
+import '../src/tokens/themes/fonts.css';
 import '../src/tokens/themes/light.css';
 import '../src/tokens/themes/dark.css';
 import '../src/tokens/themes/terminal/light.css';
