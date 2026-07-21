@@ -26,8 +26,12 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 - [x] **Theme presets (astro-blog-md)** — terminal + default light/dark (PR #15, npm 0.2.0)
 - [x] **npm first release** — publish workflow + operator release
 - [x] **Table of contents** — `kitbash-toc` (PR #20)
-- [ ] **Tags** — `kitbash-tag` + `kitbash-tag-list` (blog TagList 1:1) (`feat/tag-polish`)
-- [ ] **Next** — visual token parity, prose, cards, then site integration
+- [x] **Tags** — `kitbash-tag` + `kitbash-tag-list` (PR #21)
+- [x] **Terminal visual pass** — square CRT radius, toast/modal, spinner, TOC cue, fonts (PR #23)
+- [x] **npm 0.4.0** — toc + tags
+- [ ] **npm 0.4.1** — visual pass on npm (`chore/release-0.4.1`)
+- [ ] **Prose** — markdown body styles (`kitbash-prose` or CSS recipe)
+- [ ] **Next** — cards (optional), then site integration (separate boundary)
 - [ ] ~~Default branch rename `master` → `main`~~ — optional; skip unless desired
 
 ## Standing requirements (every component PR)
@@ -75,7 +79,7 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 
 ## Tokens already shipped (not missing)
 
-Color, **space**, **radius (round)**, **font** size/weight/family, line-height, **shadow**, **focus-ring**, light/dark themes.  
+Color, **space**, **radius** (incl. `radius-none`; terminal zeros sm/md/lg), **font** size/weight/family (optional VT323/Inter via `themes/fonts.css`), line-height, **shadow**, **focus-ring**, light/dark + terminal presets.  
 Still missing as tokens: gradients, motion/easing, z-index scale, opacity scale, density.
 
 ## Rules

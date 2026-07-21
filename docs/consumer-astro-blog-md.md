@@ -91,7 +91,7 @@ Consumers load **all** theme CSS they need; preset + theme attributes select whi
 
 1. [x] **Themes** — terminal preset + preset API + Storybook axes (PR #15).  
 2. [x] **Blog chrome** — theme/preset toggles, toggle-group, scroll-top (PR #17).  
-3. [ ] **Visual parity pass** — tokens/spacing vs regular-ui + terminal under 4 combos.  
+3. [x] **Visual parity pass** — square terminal chrome, TOC/tags, toast/modal, spinner, fonts (PR #23; more polish anytime).  
 4. [ ] **Gap components** — prose, cards (`kitbash-toc` + tag-list shipped).  
 5. [ ] **Site integration** (separate repo / expanded boundary) — swap Astro pieces one by one.
 
