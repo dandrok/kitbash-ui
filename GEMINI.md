@@ -4,16 +4,21 @@
 
 ## What this repo is
 
-`@ktbsh/ui` — product design system authored with `@ktbsh/sdk`.
+`@ktbsh/ui` — product design system authored with `@ktbsh/sdk`. **Published:** **0.4.1**.
 
 - Author: `defineComponent` in `src/components/*.ts`
-- Build: `kitbash build` → `dist/vanilla`, `dist/react`, CEM
-- Themes/tokens: design spec; generation + drift check land in tokens PR
-- Storybook: later PR
+- Build: `kitbash build` → `dist/vanilla`, `dist/react`, CEM + themes
+- Themes/tokens: `src/tokens/semantic.ts` → `bun run tokens:build` / `tokens:check`
+- Storybook: present (`bun run storybook`)
+- Blog-phase chrome (toggles, TOC, tags, terminal preset) shipped; **prose/MD body stays in the consumer**
+
+Queue + phase status: `docs/TASKS.md`. Consumer inventory: `docs/consumer-astro-blog-md.md`.
 
 ## Loop mode (summary)
 
 One coherent slice → branch → verify (`bun run verify`) → dual review → commit → PR to **master** (until renamed to `main`) → next task in `docs/TASKS.md`.
+
+Blog-driven foundation is **complete** for this repo; do not invent backlog work unless the operator asks or site integration reports a gap. Site swap is **out of boundary** (`astro-blog-md`).
 
 Always: `gh … -R dandrok/kitbash-ui`. Never other repositories.
 

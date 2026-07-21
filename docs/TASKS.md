@@ -3,7 +3,22 @@
 Ordered work for agents. Check items when the PR merges. One branch/PR per active item unless the design says otherwise.
 
 **Default branch:** `master` (until rename → `main`).  
-**Repo only:** `dandrok/kitbash-ui`.
+**Repo only:** `dandrok/kitbash-ui`.  
+**Published:** `@ktbsh/ui@0.4.1` on npm (`v0.4.1` tag).
+
+## Phase status
+
+| Phase | Status |
+|-------|--------|
+| **Design system foundation** (tokens, Storybook, primitives → nav, publish) | **Done** |
+| **Blog-driven chrome** (themes, toggles, TOC, tags, terminal visual pass) | **Done** through **0.4.1** |
+| **Markdown / article body (prose)** | **Deferred — site-owned** (see below) |
+| **Site integration** (`astro-blog-md` component swap) | **Next**, in the **blog repo** (outside this agent boundary) |
+| **Optional DS growth** (cards, overlays, forms extras, …) | Backlog only — not blocking consume |
+
+**Blog-phase default:** do not start optional backlog unless the operator asks or site integration finds a gap in this package.
+
+---
 
 ## Done
 
@@ -18,25 +33,32 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 - [x] Forms polish — Field, Radio, Switch (PR #9)
 - [x] Navigation — Tabs, Breadcrumb, Nav, Pagination (PR #10; CR follow-up PR #12)
 - [x] Package exports / publish prep (PR #13)
-
-## In progress / next
-
-- [x] **Blog chrome** — theme/preset toggles, toggle-group, scroll-top (PR #17)
-- [x] **Form control visuals** — custom checkbox/radio/switch/select + dark skeleton (PR #18)
 - [x] **Theme presets (astro-blog-md)** — terminal + default light/dark (PR #15, npm 0.2.0)
 - [x] **npm first release** — publish workflow + operator release
+- [x] **Blog chrome** — theme/preset toggles, toggle-group, scroll-top (PR #17)
+- [x] **Form control visuals** — custom checkbox/radio/switch/select + dark skeleton (PR #18)
 - [x] **Table of contents** — `kitbash-toc` (PR #20)
 - [x] **Tags** — `kitbash-tag` + `kitbash-tag-list` (PR #21)
-- [x] **Terminal visual pass** — square CRT radius, toast/modal, spinner, TOC cue, fonts (PR #23)
 - [x] **npm 0.4.0** — toc + tags
-- [ ] **npm 0.4.1** — visual pass on npm (`chore/release-0.4.1`)
-- [ ] **Prose** — markdown body styles (`kitbash-prose` or CSS recipe)
-- [ ] **Next** — cards (optional), then site integration (separate boundary)
+- [x] **Terminal visual pass** — square CRT radius, toast/modal, spinner, TOC cue, fonts (PR #23)
+- [x] **npm 0.4.1** — visual pass on npm (`v0.4.1` / `@ktbsh/ui@0.4.1`)
+
+## Deferred / out of scope for blog phase
+
+- [ ] ~~**Prose** (`kitbash-prose` or CSS recipe)~~ — **site-owned**. Articles stay Markdown in `astro-blog-md`; body styles stay in the site (e.g. `.terminal-content`). Kitbash replaces **UI chrome components**, not the MD content pipeline. Optional later: extract a shared CSS recipe if a second consumer needs the same look.
 - [ ] ~~Default branch rename `master` → `main`~~ — optional; skip unless desired
+
+## Next (operator / other repo)
+
+1. **Site integration** — in **`astro-blog-md`** (separate boundary): install `@ktbsh/ui@0.4.1`, load themes/fonts, swap Astro chrome (toggles, tags, TOC, scroll-top, pagination, etc.). Do **not** rewrite articles as components.
+2. **Feedback loop** — if integration needs a fix or missing prop, open a focused PR **here**.
+3. **Optional DS growth** — backlog below only when asked.
+
+Consumer inventory: [`docs/consumer-astro-blog-md.md`](./consumer-astro-blog-md.md).
 
 ## Standing requirements (every component PR)
 
-- **A11y / WCAG 2.2 AA** from first ship — see `docs/a11y.md` and `AGENTS.md`
+- **A11y / WCAG 2.2 AA** from first ship — see [`a11y.md`](./a11y.md) and [`AGENTS.md`](../AGENTS.md)
 - **Tokens only** via semantic `--kb-*` (incl. radius/space/type — not colors only)
 - **Dual review** — `cr review` + `agy --model gemini-3.1-pro-high` before every commit
 - **Storybook stories** for new components
@@ -44,13 +66,9 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 
 ## Planned waves (backlog)
 
-### Near-term (recommended order)
+### Optional ops
 
-1. [x] **Loading** — Spinner, Progress, Skeleton  
-2. [x] **Forms polish** — Field, Radio, Switch  
-3. [x] **Navigation** — Tabs, Breadcrumb, Nav, Pagination (PR #10; CR follow-up PR #12)  
-4. [x] **Package exports / publish prep** — public entry points (`package.json` exports), optional npm release CI (PR #13)  
-5. [ ] **Default branch rename** `master` → `main` (GitHub setting + AGENTS/CI retarget)
+1. [ ] **Default branch rename** `master` → `main` (GitHub setting + AGENTS/CI retarget)
 
 ### Later / nice-to-have
 
@@ -84,6 +102,6 @@ Still missing as tokens: gradients, motion/easing, z-index scale, opacity scale,
 
 ## Rules
 
-1. Do not start the next unchecked item until the previous PR is merged (unless the user says parallelize).  
+1. Do not start optional backlog until the operator asks (blog phase is complete for this repo).  
 2. Never commit on the default branch.  
 3. `gh` always `-R dandrok/kitbash-ui`.  
