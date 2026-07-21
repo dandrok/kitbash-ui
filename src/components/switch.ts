@@ -100,14 +100,16 @@ export default defineComponent({
     .thumb {
       position: absolute;
       z-index: 1;
-      top: var(--kitbash-switch-pad);
+      /* Center in track content box (accounts for 2px track border) */
+      top: 50%;
       left: var(--kitbash-switch-pad);
       width: var(--kitbash-switch-thumb);
       height: var(--kitbash-switch-thumb);
-      border-radius: calc(var(--kb-radius-sm) - 1px);
+      border-radius: var(--kb-radius-sm);
       background: var(--kb-color-fg-muted);
       border: 1px solid var(--kb-color-border-default);
       box-shadow: var(--kb-shadow-sm);
+      transform: translateY(-50%);
       transition:
         transform 0.15s ease,
         background 0.15s ease,
@@ -125,11 +127,13 @@ export default defineComponent({
       opacity: 0;
     }
     input:checked + .track .thumb {
-      transform: translateX(
+      /* Keep vertical center while sliding */
+      transform: translate(
         calc(
           var(--kitbash-switch-w) - var(--kitbash-switch-thumb) - 2 *
             var(--kitbash-switch-pad) - 4px
-        )
+        ),
+        -50%
       );
       background: var(--kb-color-fg-on-accent);
       border-color: transparent;
