@@ -13,8 +13,8 @@ import { defineComponent } from '@ktbsh/sdk';
  * ```
  *
  * Links are cloned into the shadow tree (nested by `data-depth`), scroll-spy
- * highlights the active section, and active rows use a short first-line
- * accent bar (no terminal `>` — tall multi-line rails look noisy).
+ * highlights the active section. Active cue matches blog: full-height accent
+ * border (`|`) + terminal `>` marker (opacity).
  *
  * Section targets: any element with matching `id` (native `h2`–`h4` or
  * host elements such as `kitbash-heading`). Nested rows stay collapsed until
@@ -542,7 +542,8 @@ export default defineComponent({
       padding: 0;
     }
     .toc-root {
-      padding-left: 0;
+      /* Room for active \`>\` outside the border-l rail */
+      padding-left: 0.85rem;
     }
     .toc-sublist {
       margin: var(--kb-space-2xs) 0 var(--kb-space-2xs) var(--kb-space-sm);
@@ -555,18 +556,21 @@ export default defineComponent({
     .toc-item {
       margin: 0;
     }
+    /* Blog: border-l-2 border-transparent py-1 pl-3 */
     .toc-link {
       position: relative;
       display: block;
       box-sizing: border-box;
       min-height: 1.5rem;
-      padding: var(--kb-space-xs) var(--kb-space-sm) var(--kb-space-xs)
-        calc(var(--kb-space-sm) + 0.35rem);
+      padding: var(--kb-space-xs) var(--kb-space-sm);
       margin: 0;
+      border-left: 2px solid transparent;
       color: var(--kb-color-fg-muted);
       text-decoration: none;
       line-height: var(--kb-line-height-normal);
-      transition: color 0.15s ease;
+      transition:
+        color 0.15s ease,
+        border-color 0.15s ease;
     }
     .toc-link--sub {
       font-size: var(--kb-font-size-sm);
@@ -579,25 +583,27 @@ export default defineComponent({
       outline-offset: 2px;
       color: var(--kb-color-accent-default);
     }
+    /* Blog active: text bright + border-green-500 (full-height |) */
     .toc-link.active {
-      color: var(--kb-color-fg-default);
+      color: var(--kb-color-accent-default);
+      border-left-color: var(--kb-color-accent-default);
       font-weight: var(--kb-font-weight-medium);
     }
-    /*
-     * Active cue: short accent bar on the first line only (no \`>\`).
-     * Full-height border + chevron looked like a tall \`>|\` on wrapped titles.
-     */
-    .toc-link.active::before {
-      content: '';
+    /* Blog: .toc-link::before { content: '>'; opacity: 0 } .active { opacity: 1 } */
+    .toc-link::before {
+      content: '>';
       position: absolute;
-      left: 0;
+      left: -0.75rem;
       top: var(--kb-space-xs);
-      width: 2px;
-      /* One line of text — does not grow with multi-line titles */
-      height: 1.15em;
-      border-radius: 1px;
-      background: var(--kb-color-accent-default);
+      line-height: var(--kb-line-height-normal);
+      color: var(--kb-color-accent-default);
+      font-weight: var(--kb-font-weight-semibold);
+      opacity: 0;
+      transition: opacity 0.15s ease;
       pointer-events: none;
+    }
+    .toc-link.active::before {
+      opacity: 1;
     }
     slot {
       display: none;
