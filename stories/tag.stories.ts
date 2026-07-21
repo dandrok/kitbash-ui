@@ -15,7 +15,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Blog TagList.astro 1:1: outline chips, `#` prefix, accent@30% border + 5% wash, text-xs, px-2 py-1, flex-wrap gap-2. Terminal preset → Matrix green; default → blue. Compose with `kitbash-tag` children (wrap in `<a>` for links).',
+          'Tag chips: outline, `#` prefix, accent@30% border + 5% wash, text-xs, px-2 py-1, flex-wrap gap-2. Terminal preset → Matrix green; default → blue. Compose with `kitbash-tag` children (wrap in `<a>` for links).',
       },
     },
   },
@@ -26,14 +26,13 @@ type Story = StoryObj;
 
 const sample = ['react', 'hooks', 'typescript', 'astro', 'css'];
 
-/** Same structure as blog TagList usage sites. */
-export const BlogTagList: Story = {
-  name: 'Blog TagList',
+/** Flex-wrap list of tags (generic metadata chips). */
+export const TagList: Story = {
+  name: 'Tag list',
   render: () => html`
     <kitbash-stack gap="md">
       <kitbash-text tone="muted"
-        >Compare with terminal vs default preset in the toolbar (blog dual
-        palette).</kitbash-text
+        >Compare terminal vs default preset in the toolbar.</kitbash-text
       >
       <kitbash-tag-list>
         ${sample.map((t) => html`<kitbash-tag>${t}</kitbash-tag>`)}

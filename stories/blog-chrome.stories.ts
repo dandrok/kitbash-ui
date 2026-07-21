@@ -10,13 +10,13 @@ import '../dist/vanilla/stack.js';
 import '../dist/vanilla/text.js';
 
 const meta = {
-  title: 'Navigation/Blog chrome',
+  title: 'Chrome/Site chrome',
   tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
         component:
-          'Header toggles and scroll-to-top patterned after astro-blog-md. Use Storybook **Theme** + **Preset** toolbars together with these controls.',
+          'App-shell chrome: theme/preset toggles and scroll-to-top. Use Storybook **Theme** + **Preset** toolbars with these controls. Suitable for any site header, not blog-only.',
       },
     },
   },
@@ -29,8 +29,9 @@ export const Toggles: Story = {
   render: () => html`
     <kitbash-stack gap="md">
       <kitbash-text size="sm" tone="muted">
-        Segmented group (blog header). Click to flip document theme / preset +
-        localStorage. Labels use theme=night (display) while value is dark.
+        Segmented toggle group for the app shell. Click to flip document theme /
+        preset + localStorage. Labels use theme=night (display) while value is
+        dark.
       </kitbash-text>
       <kitbash-toggle-group>
         <kitbash-theme-toggle></kitbash-theme-toggle>

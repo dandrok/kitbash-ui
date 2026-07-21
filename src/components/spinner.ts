@@ -1,9 +1,12 @@
 import { defineComponent } from '@ktbsh/sdk';
 
 /**
- * Indeterminate loading indicator.
- * A11y: `role="status"` with visually hidden text (more reliable than
- * empty + aria-label alone). Animation reduced under prefers-reduced-motion.
+ * Indeterminate loading indicator — terminal “activity glyph” spinner.
+ *
+ * Cycles classic braille loader frames (the familiar CLI look) with a soft
+ * accent glow. Circular/glyph-based on purpose (not a forced square box).
+ *
+ * A11y: `role="status"` + sr-only label. Static glyph under reduced motion.
  */
 export default defineComponent({
   tag: 'kitbash-spinner',
@@ -19,40 +22,108 @@ export default defineComponent({
       color: var(--kb-color-accent-default);
       vertical-align: middle;
       position: relative;
+      font-family: var(--kb-font-family-sans);
     }
     .root {
-      display: inline-block;
-      box-sizing: border-box;
-      border-radius: var(--kb-radius-full);
-      border-style: solid;
-      border-color: currentColor transparent currentColor transparent;
-      animation: kitbash-spin 0.7s linear infinite;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+      /* Soft CRT halo around the glyph */
+      filter: drop-shadow(
+        0 0 0.35em
+          color-mix(in srgb, var(--kb-color-accent-default) 55%, transparent)
+      );
     }
     .sm {
       width: 1rem;
       height: 1rem;
-      border-width: 2px;
+      font-size: 0.95rem;
     }
     .md {
       width: 1.5rem;
       height: 1.5rem;
-      border-width: 2px;
+      font-size: 1.35rem;
     }
     .lg {
       width: 2.25rem;
       height: 2.25rem;
-      border-width: 3px;
+      font-size: 2rem;
     }
-    @keyframes kitbash-spin {
-      to {
-        transform: rotate(360deg);
+    /*
+     * Braille spinner frames (stacked; one visible at a time).
+     * Pattern used by many CLIs / Ink / ora-style loaders.
+     */
+    .frame {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      animation: kitbash-braille 0.8s steps(1, end) infinite;
+      font-weight: var(--kb-font-weight-regular);
+      color: currentColor;
+      user-select: none;
+      pointer-events: none;
+    }
+    .frame:nth-child(1) {
+      animation-delay: 0s;
+    }
+    .frame:nth-child(2) {
+      animation-delay: -0.72s;
+    }
+    .frame:nth-child(3) {
+      animation-delay: -0.64s;
+    }
+    .frame:nth-child(4) {
+      animation-delay: -0.56s;
+    }
+    .frame:nth-child(5) {
+      animation-delay: -0.48s;
+    }
+    .frame:nth-child(6) {
+      animation-delay: -0.4s;
+    }
+    .frame:nth-child(7) {
+      animation-delay: -0.32s;
+    }
+    .frame:nth-child(8) {
+      animation-delay: -0.24s;
+    }
+    .frame:nth-child(9) {
+      animation-delay: -0.16s;
+    }
+    .frame:nth-child(10) {
+      animation-delay: -0.08s;
+    }
+    /*
+     * Each frame is fully opaque for 1/10 of the cycle.
+     * Negative delay staggers so they take turns.
+     */
+    @keyframes kitbash-braille {
+      0%,
+      9.99% {
+        opacity: 1;
+      }
+      10%,
+      100% {
+        opacity: 0;
       }
     }
     @media (prefers-reduced-motion: reduce) {
-      .root {
+      .frame {
         animation: none;
-        border-color: currentColor;
-        opacity: 0.7;
+        opacity: 0;
+      }
+      /* Prefer a steady “busy” glyph when motion is off */
+      .frame:nth-child(1) {
+        opacity: 1;
+      }
+      .root {
+        filter: none;
+        opacity: 0.85;
       }
     }
     .sr-only {
@@ -74,9 +145,18 @@ export default defineComponent({
         ? props.label
         : 'Loading';
 
+    // Braille sequence (U+280B … cycle used by common terminal spinners)
+    const frames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+
     return html`
       <span part="spinner-root" class=${`root ${size}`} role="status">
         <span class="sr-only">${label}</span>
+        ${frames.map(
+          (ch) =>
+            html`<span class="frame" part="spinner-frame" aria-hidden="true"
+              >${ch}</span
+            >`,
+        )}
       </span>
     `;
   },

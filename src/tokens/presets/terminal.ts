@@ -50,10 +50,14 @@ export const terminalTokens = {
   'space-xl': { light: '32px', dark: '32px' },
   'space-2xl': { light: '48px', dark: '48px' },
 
-  /* Radius — tighter terminal chrome */
-  'radius-sm': { light: '2px', dark: '2px' },
-  'radius-md': { light: '4px', dark: '4px' },
-  'radius-lg': { light: '6px', dark: '6px' },
+  /*
+   * Radius — true terminal chrome: square boxes (0).
+   * Keep full for geometric circles only (radio indicator, spinner ring).
+   */
+  'radius-none': { light: '0', dark: '0' },
+  'radius-sm': { light: '0', dark: '0' },
+  'radius-md': { light: '0', dark: '0' },
+  'radius-lg': { light: '0', dark: '0' },
   'radius-full': { light: '9999px', dark: '9999px' },
 
   /* Typography — mono stack (VT323 optional via consumer @font-face) */

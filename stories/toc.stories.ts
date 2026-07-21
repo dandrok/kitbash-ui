@@ -45,7 +45,8 @@ const sections = [
   { id: 'menu', depth: 2, title: 'The Full Hook Menu' },
 ];
 
-export const BlogStyle: Story = {
+export const Sidebar: Story = {
+  name: 'Sidebar layout',
   render: () => html`
     <div
       style="display: grid; grid-template-columns: 16rem 1fr; gap: 2rem; max-width: 56rem; margin: 0 auto; padding: 1.5rem 1rem 8rem;"

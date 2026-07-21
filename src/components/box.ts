@@ -54,7 +54,7 @@ export default defineComponent({
     .r-md { border-radius: var(--kb-radius-md); }
     .r-lg { border-radius: var(--kb-radius-lg); }
     .r-full { border-radius: var(--kb-radius-full); }
-    .r-none { border-radius: 0; }
+    .r-none { border-radius: var(--kb-radius-none); }
     .border {
       border: 1px solid var(--kb-color-border-default);
     }
