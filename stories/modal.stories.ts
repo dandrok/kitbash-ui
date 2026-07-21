@@ -14,7 +14,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'Controlled via `open`. Backdrop click and Escape commit `open: false` (listen for `kitbash-change`). Focus the panel after open for keyboard Escape.',
+          'Controlled via `open`. Backdrop click and Escape commit `open: false`. Use `inline` inside a relative frame for Storybook so the dialog does not cover the whole canvas.',
       },
     },
   },
@@ -23,24 +23,56 @@ const meta = {
 export default meta;
 type Story = StoryObj;
 
+const frame = (inner: ReturnType<typeof html>) => html`
+  <div
+    style="
+      position: relative;
+      min-height: 18rem;
+      box-sizing: border-box;
+      border: 1px dashed var(--kb-color-border-default);
+      border-radius: var(--kb-radius-md);
+      background: var(--kb-color-bg-subtle);
+      overflow: hidden;
+    "
+  >
+    <p
+      style="
+        margin: 0;
+        padding: 1rem;
+        color: var(--kb-color-fg-muted);
+        font-size: 0.875rem;
+      "
+    >
+      Demo surface — modal is
+      <code style="color: var(--kb-color-fg-default)">inline</code> (contained
+      here). Apps omit
+      <code style="color: var(--kb-color-fg-default)">inline</code> for a
+      full-viewport overlay.
+    </p>
+    ${inner}
+  </div>
+`;
+
 export const Open: Story = {
-  render: () => html`
-    <kitbash-modal open title="Confirm action">
-      <kitbash-stack gap="md">
-        <kitbash-text>Are you sure you want to continue?</kitbash-text>
-        <kitbash-stack direction="row" gap="sm">
-          <kitbash-button variant="secondary">Cancel</kitbash-button>
-          <kitbash-button>Confirm</kitbash-button>
+  render: () =>
+    frame(html`
+      <kitbash-modal open inline title="Confirm action">
+        <kitbash-stack gap="md">
+          <kitbash-text>Are you sure you want to continue?</kitbash-text>
+          <kitbash-stack direction="row" gap="sm">
+            <kitbash-button variant="secondary">Cancel</kitbash-button>
+            <kitbash-button>Confirm</kitbash-button>
+          </kitbash-stack>
         </kitbash-stack>
-      </kitbash-stack>
-    </kitbash-modal>
-  `,
+      </kitbash-modal>
+    `),
 };
 
 export const Closed: Story = {
   render: () => html`
     <kitbash-text tone="muted"
-      >Modal with open=false is not visible (inspect in Controls by forking).</kitbash-text
+      >Modal with open=false is not visible (inspect in Controls by
+      forking).</kitbash-text
     >
     <kitbash-modal title="Hidden" ?open=${false}>
       <kitbash-text>Not shown</kitbash-text>

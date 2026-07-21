@@ -13,6 +13,8 @@ export default defineComponent({
   props: {
     open: { type: Boolean, default: false },
     title: { type: String, default: '' },
+    /** Absolute in a relative parent (Storybook); default fixed full viewport. */
+    inline: { type: Boolean, default: false },
   },
   styles: `
     :host {
@@ -33,17 +35,25 @@ export default defineComponent({
       padding: var(--kb-space-md);
       box-sizing: border-box;
     }
+    :host([open][inline]) {
+      position: absolute;
+      z-index: 2;
+    }
     .backdrop {
       position: absolute;
       inset: 0;
-      background: rgba(15, 23, 42, 0.45);
+      background: color-mix(
+        in srgb,
+        var(--kb-color-fg-default) 45%,
+        transparent
+      );
     }
     .panel {
       position: relative;
       z-index: 1;
       box-sizing: border-box;
-      width: min(28rem, calc(100vw - 2 * var(--kb-space-md)));
-      max-height: calc(100vh - 2 * var(--kb-space-md));
+      width: min(28rem, calc(100% - 2 * var(--kb-space-md)));
+      max-height: min(80vh, calc(100% - 2 * var(--kb-space-md)));
       overflow: auto;
       padding: var(--kb-space-lg);
       border-radius: var(--kb-radius-lg);
