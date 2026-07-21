@@ -305,17 +305,20 @@ Edit `semantic.ts` only, then `tokens:build`. Do not hand-patch generated CSS/JS
 
 | Surface | Owns |
 |---------|------|
-| README | Install, scripts, consume |
+| README | Install, scripts, consume, published version / surface |
 | Storybook | Component API playground + a11y notes |
 | AGENTS.md | Agent loop, git/PR rules, pins, security, a11y gates |
 | docs/a11y.md | WCAG 2.2 AA target, component checklist, testing |
 | docs/security-and-secrets.md | Tokens, Path A/B secrets, DS security bar |
 | docs/sdk-feedback.md | Pain points / wishlist for `@ktbsh/sdk` (append when blocked) |
-| docs/TASKS.md | Ordered implementation queue |
+| docs/TASKS.md | Ordered queue + **phase status** (blog phase done through 0.4.1; optional backlog) |
+| docs/consumer-astro-blog-md.md | Blog → DS inventory; prose site-owned; integration next (other repo) |
 | docs/superpowers/specs/ | Design decisions |
 
 When an SDK limitation forces a non-obvious workaround in a component, add a one-line comment in the component **and** a row in `docs/sdk-feedback.md`.
 
 Architecture source of truth for this phase:
 
-`docs/superpowers/specs/2026-07-19-kitbash-ui-design-system-design.md`
+[docs/superpowers/specs/2026-07-19-kitbash-ui-design-system-design.md](./docs/superpowers/specs/2026-07-19-kitbash-ui-design-system-design.md)
+
+**Blog-driven DS work for this repo is complete at `@ktbsh/ui@0.4.1`.** Prefer consumer integration feedback over inventing optional backlog. Site edits are **out of boundary** until the operator expands it.

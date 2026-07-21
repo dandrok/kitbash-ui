@@ -3,7 +3,22 @@
 **Scope:** plan and align the design system first.  
 **Do not edit** the Astro site from this repo’s agent loop until the operator expands the repo boundary.
 
+**DS package ready for consume:** `@ktbsh/ui@0.4.1` (npm + `v0.4.1`).  
 Source inspected (read-only): `../astro-blog-md` (sibling checkout).
+
+---
+
+## Integration model (locked)
+
+| Concern | Owner |
+|---------|--------|
+| **Article content** | Blog — Markdown in `astro-blog-md` (unchanged) |
+| **Article body styles** | Blog — site CSS (e.g. `.terminal-content`); **not** a kitbash prose CE |
+| **Mermaid, code copy, SEO** | Blog — app-specific |
+| **UI chrome components** | `@ktbsh/ui` — swap Astro pieces for `kitbash-*` tags |
+| **Themes / presets / fonts** | `@ktbsh/ui` theme CSS + `applyTheme` / `applyPreset` |
+
+Articles stay MD → HTML in light DOM → blog styles. Kitbash is for **reusable chrome**, not rewriting posts as components.
 
 ---
 
@@ -66,7 +81,7 @@ Consumers load **all** theme CSS they need; preset + theme attributes select whi
 
 | Blog component | Role | Kitbash today | Wave |
 |----------------|------|---------------|------|
-| ThemeToggle | light/dark toggle | **`kitbash-theme-toggle`** | shipped (blog chrome wave) |
+| ThemeToggle | light/dark toggle | **`kitbash-theme-toggle`** | shipped |
 | UiToggle | terminal/regular | **`kitbash-preset-toggle`** (+ `kitbash-toggle-group`) | shipped |
 | PageHeader | site header + nav | `kitbash-nav` + layout (`box`/`stack`) | compose, not new CE |
 | Footer | site footer | layout + `text`/`link` | compose |
@@ -75,32 +90,32 @@ Consumers load **all** theme CSS they need; preset + theme attributes select whi
 | BlogList / BlogPostPreview | list + cards | layout + `heading`/`text`/`link` | compose; optional `card` later |
 | Pagination | page nav | **`kitbash-pagination`** | wire in site |
 | TableOfContents | in-page nav | **`kitbash-toc`** (light-DOM links + scroll-spy) | shipped |
-| Prose | markdown body styles | **missing** (`prose` recipe or CSS) | later |
+| Prose | markdown body styles | **site-owned** (keep blog CSS / MD pipeline) | **deferred** — not a DS requirement for blog |
 | TerminalTitle | decorative title | `heading` + styles | compose |
 | PulseCursor | decorative caret | decorative only | site-specific CSS ok |
 | ScrollToTop | FAB control | **`kitbash-scroll-top`** (`visible` from app scroll) | shipped |
 | BaseHead | meta/SEO | Astro only | stay in app |
 
-**Already strong in DS:** button, link, text, heading, stack, box, container, badge, nav, pagination, alert, tabs, breadcrumb, forms, loading.
+**Already strong in DS:** button, link, text, heading, stack, box, container, badge, nav, pagination, alert, tabs, breadcrumb, forms, loading, toast, modal, spinner, progress, skeleton.
 
-**A11y bar:** blog targets WCAG-minded focus, contrast (terminal AAA notes), reduced motion. DS must keep **WCAG 2.2 AA** (`docs/a11y.md`) when porting visuals.
+**A11y bar:** blog targets WCAG-minded focus, contrast (terminal AAA notes), reduced motion. DS must keep **WCAG 2.2 AA** ([`a11y.md`](./a11y.md)) when porting visuals.
 
 ---
 
-## Phased work (slow)
+## Phased work
 
 1. [x] **Themes** — terminal preset + preset API + Storybook axes (PR #15).  
 2. [x] **Blog chrome** — theme/preset toggles, toggle-group, scroll-top (PR #17).  
-3. [x] **Visual parity pass** — square terminal chrome, TOC/tags, toast/modal, spinner, fonts (PR #23; more polish anytime).  
-4. [ ] **Gap components** — prose, cards (`kitbash-toc` + tag-list shipped).  
-5. [ ] **Site integration** (separate repo / expanded boundary) — swap Astro pieces one by one.
+3. [x] **Visual parity pass** — square terminal chrome, TOC/tags, toast/modal, spinner, fonts (PR #23; npm **0.4.1**).  
+4. [x] **Gap components for blog chrome** — `kitbash-toc` + tags shipped; **prose stays in the site**. Optional `card` only if list UI needs it later.  
+5. [ ] **Site integration** (separate repo / expanded boundary) — install `@ktbsh/ui@0.4.1`, swap Astro chrome one by one; leave MD + prose CSS in the blog.
 
 ---
 
 ## Do not break
 
 - Existing `data-theme` light/dark default (no preset) still works.  
-- `@ktbsh/ui@0.1.0` export paths for `./themes/light.css` and `./themes/dark.css` stay valid.  
+- `@ktbsh/ui` export paths for `./themes/light.css` and `./themes/dark.css` stay valid (since 0.1.0).  
 - Components keep **only** `var(--kb-*)` — presets only reassign those variables.
 
 ### Theming caveat (fixed in kitbash-ui)
