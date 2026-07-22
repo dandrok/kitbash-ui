@@ -13,8 +13,8 @@ import { defineComponent } from '@ktbsh/sdk';
  * ```
  *
  * Links are cloned into the shadow tree (nested by `data-depth`), scroll-spy
- * highlights the active section. Active cue matches blog: full-height accent
- * border (`|`) + terminal `>` marker (opacity).
+ * highlights the active section. Active cue: top-level full-height `|` rail;
+ * nested rows use a first-line `>` only (no border).
  *
  * Section targets: any element with matching `id` (native `h2`–`h4` or
  * host elements such as `kitbash-heading`). Nested rows stay collapsed until
@@ -546,7 +546,8 @@ export default defineComponent({
       padding-left: calc(var(--kb-toc-marker-offset) + 0.1rem);
     }
     .toc-sublist {
-      margin: var(--kb-space-2xs) 0 var(--kb-space-2xs) var(--kb-space-sm);
+      /* Indent under parent title so nested reads as “inside” */
+      margin: var(--kb-space-2xs) 0 var(--kb-space-2xs) var(--kb-space-md);
       /* Blog: collapse nested until active path */
       display: none;
     }
@@ -556,7 +557,7 @@ export default defineComponent({
     .toc-item {
       margin: 0;
     }
-    /* Blog: border-l-2 border-transparent py-1 pl-3 */
+    /* Top-level: border-l rail for | cue; nested override below */
     .toc-link {
       position: relative;
       display: block;
@@ -574,6 +575,10 @@ export default defineComponent({
     }
     .toc-link--sub {
       font-size: var(--kb-font-size-sm);
+      /* No | rail geometry — only a tight > next to the label */
+      border-left: none;
+      --kb-toc-sub-marker: 0.7rem;
+      padding-left: var(--kb-toc-sub-marker);
     }
     .toc-link:hover {
       color: var(--kb-color-accent-default);
@@ -583,19 +588,23 @@ export default defineComponent({
       outline-offset: 2px;
       color: var(--kb-color-accent-default);
     }
-    /* Blog active: text bright + border-green-500 (full-height |) */
+    /* Active text; rail / marker differ for main vs nested */
     .toc-link.active {
       color: var(--kb-color-accent-default);
-      border-left-color: var(--kb-color-accent-default);
       font-weight: var(--kb-font-weight-medium);
     }
-    /* Blog: .toc-link::before { content: '>'; opacity: 0 } .active { opacity: 1 } */
-    .toc-link::before {
+    /* Top-level: full-height | accent (border only, no >) */
+    .toc-link.active:not(.toc-link--sub) {
+      border-left-color: var(--kb-color-accent-default);
+    }
+    /* Nested: first-line > snug to text (inside parent indent) */
+    .toc-link--sub::before {
       /* Slash alt-text: decorative marker (empty alternative for AT) */
       content: '>' / '';
       position: absolute;
-      left: calc(-1 * var(--kb-toc-marker-offset));
+      left: 0;
       top: var(--kb-space-xs);
+      width: calc(var(--kb-toc-sub-marker) - 0.15rem);
       line-height: var(--kb-line-height-normal);
       color: var(--kb-color-accent-default);
       font-weight: var(--kb-font-weight-semibold);
@@ -603,14 +612,15 @@ export default defineComponent({
       transition: opacity 0.15s ease;
       pointer-events: none;
     }
-    .toc-link.active::before {
+    .toc-link--sub.active::before {
       opacity: 1;
     }
     slot {
       display: none;
     }
     @media (prefers-reduced-motion: reduce) {
-      .toc-link {
+      .toc-link,
+      .toc-link--sub::before {
         transition: none;
       }
     }

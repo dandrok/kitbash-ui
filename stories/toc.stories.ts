@@ -15,7 +15,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'In-page TOC from light-DOM heading links (`href` + `data-depth`). Clones links into a nested list, scroll-spies section ids, and marks the active row with a short first-line accent bar. Nested rows open along the active path. Set `--kb-toc-offset` (px, unitless) for sticky headers.',
+          'In-page TOC from light-DOM heading links (`href` + `data-depth`). Clones links into a nested list, scroll-spies section ids, and marks the active row: top-level full-height `|` rail, nested first-line `>` only. Nested rows open along the active path. Set `--kb-toc-offset` (px, unitless) for sticky headers.',
       },
     },
     layout: 'fullscreen',
