@@ -10,6 +10,7 @@
  *   import '@ktbsh/ui/themes/dark.css'
  *   import '@ktbsh/ui/themes/terminal/light.css' // optional
  *   import '@ktbsh/ui/themes/terminal/dark.css'
+ *   import '@ktbsh/ui/themes/focus.css' // light-DOM focus ≡ CE --kb-focus-ring
  *
  * applyTheme('light'|'dark'); applyPreset('default'|'terminal');
  */

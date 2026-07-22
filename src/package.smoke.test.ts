@@ -8,7 +8,7 @@ const root = resolve(import.meta.dir, '..');
 
 test('package identity is @ktbsh/ui', () => {
   expect(pkg.name).toBe('@ktbsh/ui');
-  expect(pkg.version).toBe('0.4.2');
+  expect(pkg.version).toBe('0.4.3');
 });
 
 test('package.json exposes public export map (dist-only runtime)', () => {
@@ -70,6 +70,7 @@ test('built component, theme, and entry files resolve for documented subpaths', 
     'dist/types/index.d.ts',
     'dist/themes/light.css',
     'dist/themes/dark.css',
+    'dist/themes/focus.css',
     'dist/themes/terminal/light.css',
     'dist/themes/terminal/dark.css',
     'dist/vanilla/button.js',

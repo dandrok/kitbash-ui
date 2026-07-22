@@ -68,6 +68,7 @@ function assertOutputs(): void {
     'types/index.d.ts',
     'themes/light.css',
     'themes/dark.css',
+    'themes/focus.css',
     'themes/terminal/light.css',
     'themes/terminal/dark.css',
     'vanilla/button.js',
