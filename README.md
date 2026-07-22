@@ -6,7 +6,7 @@ Author once → vanilla custom elements + React wrappers + Custom Elements Manif
 | | |
 |--|--|
 | **Package** | [`@ktbsh/ui`](https://www.npmjs.com/package/@ktbsh/ui) |
-| **Current** | **0.4.2** (`v0.4.2`) |
+| **Current** | **0.4.3** (`v0.4.3`) |
 | **Tags** | `kitbash-*` primitives, layout, forms, nav, feedback, blog chrome |
 | **Runtime** | Bun ≥ 1.3.14 |
 
@@ -68,7 +68,7 @@ dist/
 
 `<name>` matches the component file (e.g. `button`, `stack`, `toc`, `tag-list`).
 
-### Component surface (0.4.2)
+### Component surface (0.4.3)
 
 | Area | Tags (short) |
 |------|----------------|
@@ -164,22 +164,22 @@ React is an **optional peer** (`react` ≥ 18). Vanilla-only apps do not need it
 
 ### Cut a release (maintainers)
 
-1. On a **feature branch**, bump `"version"` in `package.json` (and smoke test if present); open a PR — never commit the bump only on `master`. Current version is **0.4.2**.
+1. On a **feature branch**, bump `"version"` in `package.json` (and smoke test if present); open a PR — never commit the bump only on `master`. Current version is **0.4.3**.
 2. Merge the version PR; `master` green.
 3. Pull `master`, confirm `package.json` version, then tag and push (tag must match):
 
 ```bash
 git checkout master && git pull
-# package.json version is e.g. 0.4.2
-git tag v0.4.2
-git push origin v0.4.2
+# package.json version is e.g. 0.4.3
+git tag v0.4.3
+git push origin v0.4.3
 ```
 
 4. GitHub Actions workflow **Publish** runs `bun run verify` then `npm publish` using secret `NPM_TOKEN`.
 5. Check: https://www.npmjs.com/package/@ktbsh/ui
 
 Semver guide: **patch** fixes/polish, **minor** new components/exports, **major** breaking changes.  
-Prefer an exact pin (`0.4.2`) or a constrained range (`~0.4.2`) in consumers.
+Prefer an exact pin (`0.4.3`) or a constrained range (`~0.4.3`) in consumers.
 
 ## Authoring
 

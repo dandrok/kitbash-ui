@@ -3,7 +3,7 @@
 **Scope:** plan and align the design system first.  
 **Do not edit** the Astro site from this repo’s agent loop until the operator expands the repo boundary.
 
-**DS package ready for consume:** `@ktbsh/ui@0.4.2` (npm + `v0.4.2`).  
+**DS package ready for consume:** `@ktbsh/ui@0.4.3` (npm + `v0.4.3`) — unified focus + softer terminal chrome.  
 Source inspected (read-only): `../astro-blog-md` (sibling checkout).
 
 ---
@@ -126,7 +126,7 @@ Consumers load **all** theme CSS they need; preset + theme attributes select whi
 2. [x] **Blog chrome** — theme/preset toggles, toggle-group, scroll-top (PR #17).  
 3. [x] **Visual parity pass** — square terminal chrome, TOC/tags, toast/modal, spinner, fonts (PR #23; npm **0.4.1**).  
 4. [x] **Gap components for blog chrome** — `kitbash-toc` + tags shipped; **prose stays in the site**. Optional `card` only if list UI needs it later.  
-5. [ ] **Site integration** (separate repo / expanded boundary) — install `@ktbsh/ui@0.4.2`, swap Astro chrome one by one; leave MD + prose CSS in the blog.
+5. [ ] **Site integration** — install `@ktbsh/ui@0.4.3`, import `themes/focus.css`, drop dashed/legacy focus CSS; swap remaining Astro chrome as needed; leave MD + prose CSS in the blog.
 
 ---
 
