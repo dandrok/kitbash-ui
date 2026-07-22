@@ -43,7 +43,7 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 - [x] **Terminal visual pass** — square CRT radius, toast/modal, spinner, TOC cue, fonts (PR #23)
 - [x] **npm 0.4.1** — visual pass on npm (`v0.4.1` / `@ktbsh/ui@0.4.1`)
 - [x] **npm 0.4.2** — TOC nested click/scroll + active markers (`v0.4.2` / `@ktbsh/ui@0.4.2`)
-- [ ] **npm 0.4.3** — unified focus-ring + softer terminal chrome + `themes/focus.css`
+- [x] **npm 0.4.3** — unified focus-ring + softer terminal chrome + `themes/focus.css`
 
 ## Deferred / out of scope for blog phase
 

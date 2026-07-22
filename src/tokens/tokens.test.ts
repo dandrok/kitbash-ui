@@ -62,4 +62,82 @@ describe('semantic tokens', () => {
     expect(getPreset(el)).toBe('default');
     expect(el.dataset.kbPreset).toBeUndefined();
   });
+
+  test('terminal focus-ring meets ≥3:1 vs canvas (WCAG 2.4.13 aim)', () => {
+    // Effective ring color = alpha-blend of ring RGB over canvas (box-shadow ring pixels).
+    const canvas = {
+      light: terminalTokens['color-bg-canvas'].light,
+      dark: terminalTokens['color-bg-canvas'].dark,
+    } as const;
+    for (const theme of ['light', 'dark'] as const) {
+      const ringCss = terminalTokens['focus-ring'][theme];
+      const m = ringCss.match(
+        /rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)\s*\)/i,
+      );
+      expect(m, `${theme} focus-ring rgba`).not.toBeNull();
+      if (!m) continue;
+      const r = Number(m[1]);
+      const g = Number(m[2]);
+      const b = Number(m[3]);
+      const a = Number(m[4]);
+      const bg = parseHexRgb(canvas[theme]);
+      const effective = blendOver(r, g, b, a, bg);
+      const ratio = contrastRatio(effective, bg);
+      expect(ratio, `${theme} focus-ring vs canvas`).toBeGreaterThanOrEqual(3);
+    }
+  });
 });
+
+/** Parse `#rgb` / `#rrggbb` to 0–255 channels. */
+function parseHexRgb(hex: string): [number, number, number] {
+  const h = hex.trim().replace(/^#/, '');
+  if (h.length === 3) {
+    return [
+      Number.parseInt(h[0] + h[0], 16),
+      Number.parseInt(h[1] + h[1], 16),
+      Number.parseInt(h[2] + h[2], 16),
+    ];
+  }
+  if (h.length !== 6) {
+    throw new Error(`expected #rrggbb, got ${hex}`);
+  }
+  return [
+    Number.parseInt(h.slice(0, 2), 16),
+    Number.parseInt(h.slice(2, 4), 16),
+    Number.parseInt(h.slice(4, 6), 16),
+  ];
+}
+
+function srgbToLin(c: number): number {
+  const x = c / 255;
+  return x <= 0.04045 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance([r, g, b]: [number, number, number]): number {
+  return 0.2126 * srgbToLin(r) + 0.7152 * srgbToLin(g) + 0.0722 * srgbToLin(b);
+}
+
+function contrastRatio(
+  c1: [number, number, number],
+  c2: [number, number, number],
+): number {
+  const L1 = relativeLuminance(c1);
+  const L2 = relativeLuminance(c2);
+  const hi = Math.max(L1, L2);
+  const lo = Math.min(L1, L2);
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+function blendOver(
+  r: number,
+  g: number,
+  b: number,
+  a: number,
+  bg: [number, number, number],
+): [number, number, number] {
+  return [
+    Math.round(a * r + (1 - a) * bg[0]),
+    Math.round(a * g + (1 - a) * bg[1]),
+    Math.round(a * b + (1 - a) * bg[2]),
+  ];
+}

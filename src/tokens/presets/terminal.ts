@@ -93,9 +93,10 @@ export const terminalTokens = {
     light: '0 4px 12px rgba(0, 102, 0, 0.1)',
     dark: '0 4px 16px rgba(0, 0, 0, 0.55)',
   },
-  /* Soft glow (not dashed outline) — one recipe for CEs + light-DOM focus.css */
+  /* Soft glow (not dashed outline) — one recipe for CEs + light-DOM focus.css.
+   * Light alpha ≥ ~0.62 of #006600 on canvas #f8f9fa for WCAG 2.4.13 (≥3:1). */
   'focus-ring': {
-    light: '0 0 0 3px rgba(0, 102, 0, 0.35)',
+    light: '0 0 0 3px rgba(0, 102, 0, 0.65)',
     dark: '0 0 0 3px rgba(74, 222, 128, 0.45)',
   },
 } as const satisfies Record<SemanticTokenName, TokenValue>;
