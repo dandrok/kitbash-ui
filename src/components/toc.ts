@@ -13,12 +13,14 @@ import { defineComponent } from '@ktbsh/sdk';
  * ```
  *
  * Links are cloned into the shadow tree (nested by `data-depth`), scroll-spy
- * highlights the active section. Active cue matches blog: full-height accent
- * border (`|`) + terminal `>` marker (opacity).
+ * highlights the active section. Active cue: top-level full-height `|` rail;
+ * nested rows use a first-line `>` only (no border).
  *
  * Section targets: any element with matching `id` (native `h2`–`h4` or
  * host elements such as `kitbash-heading`). Nested rows stay collapsed until
- * the active path opens them (blog “group open” behavior).
+ * the active path opens them (blog “group open” behavior). Click keeps the
+ * pinned row until the user scrolls (no post-scroll spy override that would
+ * flip nested items back to their parent).
  *
  * A11y: `nav` + `aria-label`, `aria-current="location"` on active link,
  * `:focus-visible`, `prefers-reduced-motion` for scroll/transition.
@@ -51,8 +53,6 @@ export default defineComponent({
         __kbTocActiveId?: string;
         __kbTocScrollEnd?: (ev?: Event) => void;
         __kbTocScroller?: HTMLElement;
-        __kbTocMarginEl?: HTMLElement;
-        __kbTocMarginPrev?: string;
       };
       const list = root.querySelector('.toc-root') as HTMLUListElement | null;
       if (!list || !host) return;
@@ -147,7 +147,11 @@ export default defineComponent({
           ? 0
           : scroller.getBoundingClientRect().top + scroller.clientTop;
 
-      /** Highlight only when active id changes — stops open/close flicker. */
+      /**
+       * Highlight active row and open only the nested path that needs to stay
+       * open. Surgical open/close (no mass close → reopen) so nested items do
+       * not collapse-and-expand on every sibling click.
+       */
       const updateActive = (id: string | null | undefined) => {
         if (!id || id === host.__kbTocActiveId) return;
         host.__kbTocActiveId = id;
@@ -166,22 +170,21 @@ export default defineComponent({
           }
         }
 
-        list.querySelectorAll('.toc-sublist').forEach((sub) => {
-          (sub as HTMLElement).classList.remove('is-open');
-        });
-        if (!found) return;
-
-        let el: HTMLElement | null = found.parentElement;
-        while (el && el !== list) {
-          if (el.classList.contains('toc-sublist')) {
-            el.classList.add('is-open');
+        const open = new Set<Element>();
+        if (found) {
+          let el: HTMLElement | null = found.parentElement;
+          while (el && el !== list) {
+            if (el.classList.contains('toc-sublist')) open.add(el);
+            el = el.parentElement;
           }
-          el = el.parentElement;
+          // Blog group-open: keep children visible while parent section is active
+          const li = found.closest('li.toc-item');
+          const ownSub = li?.querySelector(':scope > .toc-sublist');
+          if (ownSub) open.add(ownSub);
         }
-
-        const li = found.closest('li.toc-item');
-        const ownSub = li?.querySelector(':scope > .toc-sublist');
-        if (ownSub) ownSub.classList.add('is-open');
+        list.querySelectorAll('.toc-sublist').forEach((sub) => {
+          sub.classList.toggle('is-open', open.has(sub));
+        });
       };
 
       const scanActive = () => {
@@ -235,6 +238,21 @@ export default defineComponent({
 
         while (list.firstChild) list.removeChild(list.firstChild);
         host.__kbTocActiveId = undefined;
+        // Drop any in-flight click-scroll from a previous tree
+        host.__kbTocManual = false;
+        if (host.__kbTocManualT) {
+          clearTimeout(host.__kbTocManualT);
+          host.__kbTocManualT = undefined;
+        }
+        if (host.__kbTocScrollEnd) {
+          host.__kbTocScroller?.removeEventListener(
+            'scrollend',
+            host.__kbTocScrollEnd,
+          );
+          window.removeEventListener('scrollend', host.__kbTocScrollEnd);
+          host.__kbTocScrollEnd = undefined;
+          host.__kbTocScroller = undefined;
+        }
 
         const makeLink = (item: Node, isSub: boolean) => {
           const a = document.createElement('a');
@@ -269,15 +287,6 @@ export default defineComponent({
         };
         appendItems(tree, list, false);
 
-        const restoreScrollMargin = () => {
-          if (host.__kbTocMarginEl) {
-            host.__kbTocMarginEl.style.scrollMarginTop =
-              host.__kbTocMarginPrev ?? '';
-            host.__kbTocMarginEl = undefined;
-            host.__kbTocMarginPrev = undefined;
-          }
-        };
-
         const clearScrollEnd = () => {
           if (host.__kbTocScrollEnd) {
             host.__kbTocScroller?.removeEventListener(
@@ -290,20 +299,48 @@ export default defineComponent({
           }
         };
 
+        /**
+         * Release click-scroll pin. Do NOT re-run scanActive here: nested
+         * headings often land a few px below the spy line, and a forced scan
+         * would jump the highlight back to the parent (up) then settle again
+         * (down). Keep the clicked row until the user scrolls.
+         */
         const endManual = () => {
           if (host.__kbTocManualT) {
             clearTimeout(host.__kbTocManualT);
             host.__kbTocManualT = undefined;
           }
           clearScrollEnd();
-          restoreScrollMargin();
           host.__kbTocManual = false;
-          scanActive();
         };
 
+        const focusTarget = (target: HTMLElement) => {
+          if (
+            !target.hasAttribute('tabindex') &&
+            !target.matches(
+              'a, button, input, select, textarea, [contenteditable="true"]',
+            )
+          ) {
+            target.setAttribute('tabindex', '-1');
+          }
+          try {
+            target.focus({ preventScroll: true });
+          } catch {
+            /* ignore non-focusable hosts in old engines */
+          }
+        };
+
+        /**
+         * One smooth (or instant) scroll via scrollTo math only.
+         * Avoid scrollIntoView + temporary scroll-margin + snap-correct —
+         * those fight each other and overshoot (up then down).
+         */
         const scrollToSlug = (id: string) => {
           const target = document.getElementById(id);
-          if (!target) return;
+          if (!target) {
+            endManual();
+            return;
+          }
           const reduce =
             typeof matchMedia === 'function' &&
             matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -311,96 +348,64 @@ export default defineComponent({
           const scroller = scrollParentOf(target);
           const portTop = scrollportTopOf(scroller);
           const behavior: ScrollBehavior = reduce ? 'auto' : 'smooth';
-
-          // Abort any prior scroll-margin mutation before applying a new one
-          restoreScrollMargin();
-          host.__kbTocMarginPrev = target.style.scrollMarginTop;
-          host.__kbTocMarginEl = target;
-          // scroll-margin: browser lands under sticky chrome (Storybook + site)
-          target.style.scrollMarginTop = `${offset}px`;
-
-          const desiredTop =
+          const top = Math.max(
+            0,
             scroller.scrollTop +
-            target.getBoundingClientRect().top -
-            portTop -
-            offset;
-          const top = Math.max(0, desiredTop);
-
-          let settled = false;
-          const settle = () => {
-            if (settled) return;
-            settled = true;
-            restoreScrollMargin();
-            if (!host.isConnected || !target.isConnected) {
-              endManual();
-              return;
-            }
-            // Quiet correction if still off (no second smooth animation)
-            const err = target.getBoundingClientRect().top - portTop - offset;
-            if (Math.abs(err) > 4) {
-              scroller.scrollTop = Math.max(0, scroller.scrollTop + err);
-            }
-            if (
-              !target.hasAttribute('tabindex') &&
-              !target.matches(
-                'a, button, input, select, textarea, [contenteditable="true"]',
-              )
-            ) {
-              target.setAttribute('tabindex', '-1');
-            }
-            try {
-              target.focus({ preventScroll: true });
-            } catch {
-              /* ignore */
-            }
-            endManual();
-          };
-
+              target.getBoundingClientRect().top -
+              portTop -
+              offset,
+          );
           const dist = Math.abs(
             target.getBoundingClientRect().top - portTop - offset,
           );
-          // Already in place — no scroll, no scrollend; unlock immediately
-          if (dist < 4) {
-            try {
-              history.replaceState(null, '', `#${id}`);
-            } catch {
-              /* ignore */
-            }
-            settle();
-            return;
-          }
-
-          try {
-            target.scrollIntoView({ behavior, block: 'start' });
-          } catch {
-            scroller.scrollTo({ top, behavior });
-          }
-
-          clearScrollEnd();
-          if (!reduce && 'onscrollend' in window) {
-            const onEnd = () => settle();
-            host.__kbTocScrollEnd = onEnd;
-            host.__kbTocScroller = scroller;
-            // Either nested scroller or window may be what actually moved
-            scroller.addEventListener('scrollend', onEnd, { once: true });
-            window.addEventListener('scrollend', onEnd, { once: true });
-            host.__kbTocManualT = setTimeout(settle, 900);
-          } else {
-            const travel = Math.abs(scroller.scrollTop - top);
-            const wait = reduce
-              ? 0
-              : Math.min(900, Math.max(120, travel * 0.4));
-            host.__kbTocManualT = setTimeout(settle, wait);
-          }
 
           try {
             history.replaceState(null, '', `#${id}`);
           } catch {
             /* ignore */
           }
+
+          let settled = false;
+          const settle = () => {
+            if (settled) return;
+            settled = true;
+            if (host.isConnected && target.isConnected) focusTarget(target);
+            endManual();
+          };
+
+          // Already on target — focus + unlock without a second scroll
+          if (dist < 4) {
+            settle();
+            return;
+          }
+
+          // Prefer window.scrollTo for the document scroller (body/html quirks).
+          if (isDocumentScroller(scroller)) {
+            window.scrollTo({ top, behavior });
+          } else {
+            scroller.scrollTo({ top, behavior });
+          }
+
+          clearScrollEnd();
+          if (reduce) {
+            settle();
+            return;
+          }
+          // Hold spy for the smooth scroll; unlock on scrollend or ~1s (blog)
+          if ('onscrollend' in window) {
+            const onEnd = () => settle();
+            host.__kbTocScrollEnd = onEnd;
+            host.__kbTocScroller = scroller;
+            if (isDocumentScroller(scroller)) {
+              window.addEventListener('scrollend', onEnd, { once: true });
+            } else {
+              scroller.addEventListener('scrollend', onEnd, { once: true });
+            }
+          }
+          host.__kbTocManualT = setTimeout(settle, 1000);
         };
 
-        // Click: pin active row, scroll, hold spy until settle
+        // Click: pin active row (incl. nested path), one scroll, hold spy
         const links = Array.from(
           list.querySelectorAll('a.toc-link'),
         ) as HTMLAnchorElement[];
@@ -415,7 +420,6 @@ export default defineComponent({
               host.__kbTocManualT = undefined;
             }
             clearScrollEnd();
-            restoreScrollMargin();
             updateActive(id);
             scrollToSlug(id);
           });
@@ -456,12 +460,6 @@ export default defineComponent({
             host.__kbTocScrollEnd = undefined;
             host.__kbTocScroller = undefined;
           }
-          if (host.__kbTocMarginEl) {
-            host.__kbTocMarginEl.style.scrollMarginTop =
-              host.__kbTocMarginPrev ?? '';
-            host.__kbTocMarginEl = undefined;
-            host.__kbTocMarginPrev = undefined;
-          }
           if (host.__kbTocRaf) {
             cancelAnimationFrame(host.__kbTocRaf);
             host.__kbTocRaf = undefined;
@@ -474,6 +472,7 @@ export default defineComponent({
             clearTimeout(host.__kbTocManualT);
             host.__kbTocManualT = undefined;
           }
+          host.__kbTocManual = false;
           host.__kbTocScroll = undefined;
           host.__kbTocHeadings = undefined;
           host.__kbTocCleanup = undefined;
@@ -547,7 +546,8 @@ export default defineComponent({
       padding-left: calc(var(--kb-toc-marker-offset) + 0.1rem);
     }
     .toc-sublist {
-      margin: var(--kb-space-2xs) 0 var(--kb-space-2xs) var(--kb-space-sm);
+      /* Indent under parent title so nested reads as “inside” */
+      margin: var(--kb-space-2xs) 0 var(--kb-space-2xs) var(--kb-space-md);
       /* Blog: collapse nested until active path */
       display: none;
     }
@@ -557,7 +557,7 @@ export default defineComponent({
     .toc-item {
       margin: 0;
     }
-    /* Blog: border-l-2 border-transparent py-1 pl-3 */
+    /* Top-level: border-l rail for | cue; nested override below */
     .toc-link {
       position: relative;
       display: block;
@@ -575,6 +575,10 @@ export default defineComponent({
     }
     .toc-link--sub {
       font-size: var(--kb-font-size-sm);
+      /* No | rail geometry — only a tight > next to the label */
+      border-left: none;
+      --kb-toc-sub-marker: 0.7rem;
+      padding-left: var(--kb-toc-sub-marker);
     }
     .toc-link:hover {
       color: var(--kb-color-accent-default);
@@ -584,19 +588,23 @@ export default defineComponent({
       outline-offset: 2px;
       color: var(--kb-color-accent-default);
     }
-    /* Blog active: text bright + border-green-500 (full-height |) */
+    /* Active text; rail / marker differ for main vs nested */
     .toc-link.active {
       color: var(--kb-color-accent-default);
-      border-left-color: var(--kb-color-accent-default);
       font-weight: var(--kb-font-weight-medium);
     }
-    /* Blog: .toc-link::before { content: '>'; opacity: 0 } .active { opacity: 1 } */
-    .toc-link::before {
+    /* Top-level: full-height | accent (border only, no >) */
+    .toc-link.active:not(.toc-link--sub) {
+      border-left-color: var(--kb-color-accent-default);
+    }
+    /* Nested: first-line > snug to text (inside parent indent) */
+    .toc-link--sub::before {
       /* Slash alt-text: decorative marker (empty alternative for AT) */
       content: '>' / '';
       position: absolute;
-      left: calc(-1 * var(--kb-toc-marker-offset));
+      left: 0;
       top: var(--kb-space-xs);
+      width: calc(var(--kb-toc-sub-marker) - 0.15rem);
       line-height: var(--kb-line-height-normal);
       color: var(--kb-color-accent-default);
       font-weight: var(--kb-font-weight-semibold);
@@ -604,14 +612,15 @@ export default defineComponent({
       transition: opacity 0.15s ease;
       pointer-events: none;
     }
-    .toc-link.active::before {
+    .toc-link--sub.active::before {
       opacity: 1;
     }
     slot {
       display: none;
     }
     @media (prefers-reduced-motion: reduce) {
-      .toc-link {
+      .toc-link,
+      .toc-link--sub::before {
         transition: none;
       }
     }

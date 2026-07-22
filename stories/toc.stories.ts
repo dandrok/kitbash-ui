@@ -15,7 +15,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'In-page TOC from light-DOM heading links (`href` + `data-depth`). Clones links into a nested list, scroll-spies section ids, and marks the active row with a short first-line accent bar. Nested rows open along the active path. Set `--kb-toc-offset` (px, unitless) for sticky headers.',
+          'In-page TOC from light-DOM heading links (`href` + `data-depth`). Clones links into a nested list, scroll-spies section ids, and marks the active row: top-level full-height `|` rail, nested first-line `>` only. Nested rows open along the active path. Set `--kb-toc-offset` (px, unitless) for sticky headers.',
       },
     },
     layout: 'fullscreen',
@@ -123,6 +123,23 @@ export const Sidebar: Story = {
           window.innerHeight,
         );
       }
+    });
+
+    // Sibling under the same parent: stay nested-active, sublist stays open
+    // (no mass close/reopen glitch).
+    const coffee = toc?.shadowRoot?.querySelector(
+      'a.toc-link[data-slug="coffee"]',
+    ) as HTMLAnchorElement | null;
+    expect(coffee).toBeTruthy();
+    if (!coffee) return;
+    coffee.click();
+    await waitFor(() => {
+      expect(coffee.classList.contains('active')).toBe(true);
+      expect(coffee.getAttribute('aria-current')).toBe('location');
+      expect(sub.classList.contains('active')).toBe(false);
+      expect(sub.hasAttribute('aria-current')).toBe(false);
+      const sublist = coffee.closest('li')?.parentElement;
+      expect(sublist?.classList.contains('is-open')).toBe(true);
     });
   },
 };
