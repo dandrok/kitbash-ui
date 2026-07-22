@@ -39,8 +39,8 @@ export default defineComponent({
       text-decoration: none;
     }
     ::slotted(a:focus-visible) {
-      outline: 2px solid var(--kb-color-border-focus);
-      outline-offset: 2px;
+      outline: none;
+      box-shadow: var(--kb-focus-ring);
       border-radius: var(--kb-radius-sm);
     }
   `,

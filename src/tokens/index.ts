@@ -5,6 +5,7 @@
  *   import '@ktbsh/ui/themes/dark.css'
  *   import '@ktbsh/ui/themes/terminal/light.css'  // optional preset
  *   import '@ktbsh/ui/themes/terminal/dark.css'
+ *   import '@ktbsh/ui/themes/focus.css' // light-DOM focus baseline
  *
  * Axes: applyTheme('light'|'dark') + applyPreset('default'|'terminal')
  */

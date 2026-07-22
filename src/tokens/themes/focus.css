@@ -1,0 +1,34 @@
+/**
+ * Light-DOM focus baseline — same recipe as kitbash custom elements.
+ *
+ * Import **after** theme CSS so `--kb-focus-ring` resolves:
+ *
+ * ```css
+ * @import '@ktbsh/ui/themes/light.css';
+ * @import '@ktbsh/ui/themes/dark.css';
+ * @import '@ktbsh/ui/themes/terminal/light.css';
+ * @import '@ktbsh/ui/themes/terminal/dark.css';
+ * @import '@ktbsh/ui/themes/focus.css';
+ * ```
+ *
+ * Styles native `a` / `button` / form controls in the document. Closed shadow
+ * roots (kitbash CEs) already use `box-shadow: var(--kb-focus-ring)` internally
+ * and are not affected by this file.
+ *
+ * Consumer tip: remove competing global `outline: 2px dashed …` rules so Tab
+ * focus is one language site-wide.
+ */
+
+/* Zero-specificity: do not set border-radius (would reshape pills/icons). */
+:where(
+  a,
+  button,
+  input:not([type='hidden']),
+  select,
+  textarea,
+  summary,
+  [tabindex]:not([tabindex='-1'])
+):focus-visible {
+  outline: none;
+  box-shadow: var(--kb-focus-ring);
+}

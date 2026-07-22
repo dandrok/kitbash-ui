@@ -22,9 +22,17 @@ export const terminalTokens = {
   'color-fg-on-accent': { light: '#ffffff', dark: '#050a05' },
   'color-fg-on-inverse': { light: '#f8f9fa', dark: '#050a05' },
 
-  /* Color — border */
-  'color-border-default': { light: 'rgba(0, 102, 0, 0.25)', dark: '#00e637' },
-  'color-border-muted': { light: 'rgba(0, 102, 0, 0.15)', dark: '#00b42d' },
+  /* Color — border
+   * Dark default matches blog chrome (theme-toggle ~30% green), not full #00e637.
+   * Full Matrix green stays on accent / border-focus for active cues only. */
+  'color-border-default': {
+    light: 'rgba(0, 102, 0, 0.25)',
+    dark: 'rgba(0, 230, 55, 0.3)',
+  },
+  'color-border-muted': {
+    light: 'rgba(0, 102, 0, 0.15)',
+    dark: 'rgba(0, 230, 55, 0.15)',
+  },
   'color-border-focus': { light: '#006600', dark: '#00ff41' },
 
   /* Color — accent / status */
@@ -85,8 +93,9 @@ export const terminalTokens = {
     light: '0 4px 12px rgba(0, 102, 0, 0.1)',
     dark: '0 4px 16px rgba(0, 0, 0, 0.55)',
   },
+  /* Soft glow (not dashed outline) — one recipe for CEs + light-DOM focus.css */
   'focus-ring': {
     light: '0 0 0 3px rgba(0, 102, 0, 0.35)',
-    dark: '0 0 0 3px rgba(0, 255, 65, 0.35)',
+    dark: '0 0 0 3px rgba(74, 222, 128, 0.45)',
   },
 } as const satisfies Record<SemanticTokenName, TokenValue>;

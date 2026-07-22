@@ -75,11 +75,11 @@ export default defineComponent({
     button:hover {
       color: var(--kb-color-fg-default);
       background: var(--kb-color-bg-surface);
-      border-color: var(--kb-color-border-focus);
+      /* Keep resting border — quieter chrome hover */
     }
     button:focus-visible {
       outline: none;
-      box-shadow: var(--kb-focus-ring);
+      box-shadow: var(--kb-focus-ring), var(--kb-shadow-sm);
     }
     .caption {
       display: inline-block;

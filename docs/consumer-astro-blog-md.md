@@ -41,7 +41,7 @@ That yields **four palettes**:
 | regular + light | Blue modern light (Inter) |
 
 Persistence: `localStorage` keys `theme`, `ui-mode`. FOUC script in `SiteLayout.astro` applies both before paint.  
-A11y: dashed focus rings, `sr-only`, `prefers-reduced-motion` (CRT flicker off).
+A11y: **one focus recipe** via `--kb-focus-ring` (soft glow; CEs + optional `themes/focus.css` for natives), `sr-only`, `prefers-reduced-motion` (CRT flicker off).
 
 ### Kitbash mapping
 
@@ -69,11 +69,29 @@ import '@ktbsh/ui/themes/light.css';
 import '@ktbsh/ui/themes/dark.css';
 import '@ktbsh/ui/themes/terminal/light.css';
 import '@ktbsh/ui/themes/terminal/dark.css';
+import '@ktbsh/ui/themes/focus.css'; // light-DOM Tab focus ≡ CE focus-ring
 ```
 
 Without `fonts.css`, terminal falls back to `ui-monospace` / Courier (stack still works; less CRT).
 
 Consumers load **all** theme CSS they need; preset + theme attributes select which vars win.
+
+### Focus / chrome inheritance (source of truth = DS)
+
+| Concern | Source of truth | Blog action |
+|---------|-----------------|-------------|
+| Focus (Tab) | `--kb-focus-ring` + CE styles; optional `themes/focus.css` for natives | Import `focus.css`; **remove** global `outline: 2px dashed …` and competing `.theme-toggle:focus-visible` rules |
+| Resting chrome borders | Terminal `color-border-default` (soft `rgba` green, not full `#00e637`) | Prefer kitbash tokens / CEs; drop duplicate `.theme-toggle { border: … }` if CE owns the control |
+| Hover | Soft surface/fg change; **no** border → full `border-focus` on chrome toggles | Drop hover rules that force full primary border on toggles/TOC |
+| TOC / tags / toggles | `kitbash-toc`, `kitbash-tag*`, `kitbash-theme-toggle`, … | Already wired; leftover light-DOM `.toc-link` / `.theme-toggle` CSS is dead weight or fights shadow styles |
+
+**Quick blog align checklist** (when site boundary allows edits in `astro-blog-md`):
+
+1. Bump / path-link `@ktbsh/ui` build that includes softer terminal borders + unified focus.
+2. Import `@ktbsh/ui/themes/focus.css` after theme CSS (e.g. in `BaseHead` or `kitbash.ts` side-effect CSS).
+3. In `global.css` base layer: remove dashed `a:focus-visible, button:focus-visible` (or scope it only to places that must stay custom).
+4. Remove or neutralize legacy `.theme-toggle` / `.toc-link` hover+focus blocks that predate kitbash CEs.
+5. Keep prose-specific link hover in `.terminal-content` if desired (content is site-owned); keyboard focus should still use the DS ring when `focus.css` is loaded.
 
 ---
 

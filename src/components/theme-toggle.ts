@@ -74,11 +74,11 @@ export default defineComponent({
     button:hover {
       color: var(--kb-color-fg-default);
       background: var(--kb-color-bg-surface);
-      border-color: var(--kb-color-border-focus);
+      /* Keep resting border — quieter than jumping to border-focus */
     }
     button:focus-visible {
-      outline: 2px solid var(--kb-color-border-focus);
-      outline-offset: 2px;
+      outline: none;
+      box-shadow: var(--kb-focus-ring);
       color: var(--kb-color-fg-default);
       background: var(--kb-color-bg-surface);
     }

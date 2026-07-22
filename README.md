@@ -60,6 +60,7 @@ dist/
 | `@ktbsh/ui/themes/dark.css` | Default preset dark (`:root[data-theme="dark"]`) |
 | `@ktbsh/ui/themes/terminal/light.css` | Terminal preset light |
 | `@ktbsh/ui/themes/terminal/dark.css` | Terminal preset dark (Matrix night) |
+| `@ktbsh/ui/themes/focus.css` | Light-DOM `:focus-visible` baseline (`--kb-focus-ring`) |
 | `@ktbsh/ui/themes/fonts.css` | Optional VT323 + Inter (terminal / regular faces) |
 | `@ktbsh/ui/tokens` | Token API only |
 | `@ktbsh/ui/types` | Shared TypeScript unions |
@@ -113,6 +114,8 @@ import '@ktbsh/ui/themes/dark.css';
 // Optional Matrix-style preset (blog terminal mode):
 import '@ktbsh/ui/themes/terminal/light.css';
 import '@ktbsh/ui/themes/terminal/dark.css';
+// Match Tab focus on native a/button to kitbash CEs (import last among themes):
+import '@ktbsh/ui/themes/focus.css';
 import { applyPreset, applyTheme } from '@ktbsh/ui';
 
 applyTheme('dark'); // data-theme — light | dark (night)
