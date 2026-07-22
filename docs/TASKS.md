@@ -4,14 +4,14 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 
 **Default branch:** `master` (until rename → `main`).  
 **Repo only:** `dandrok/kitbash-ui`.  
-**Published:** `@ktbsh/ui@0.4.1` on npm (`v0.4.1` tag).
+**Published:** `@ktbsh/ui@0.4.2` on npm (`v0.4.2` tag).
 
 ## Phase status
 
 | Phase | Status |
 |-------|--------|
 | **Design system foundation** (tokens, Storybook, primitives → nav, publish) | **Done** |
-| **Blog-driven chrome** (themes, toggles, TOC, tags, terminal visual pass) | **Done** through **0.4.1** |
+| **Blog-driven chrome** (themes, toggles, TOC, tags, terminal visual pass) | **Done** through **0.4.2** |
 | **Markdown / article body (prose)** | **Deferred — site-owned** (see below) |
 | **Site integration** (`astro-blog-md` component swap) | **Next**, in the **blog repo** (outside this agent boundary) |
 | **Optional DS growth** (cards, overlays, forms extras, …) | Backlog only — not blocking consume |
@@ -42,6 +42,7 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 - [x] **npm 0.4.0** — toc + tags
 - [x] **Terminal visual pass** — square CRT radius, toast/modal, spinner, TOC cue, fonts (PR #23)
 - [x] **npm 0.4.1** — visual pass on npm (`v0.4.1` / `@ktbsh/ui@0.4.1`)
+- [x] **npm 0.4.2** — TOC nested click/scroll + active markers (`v0.4.2` / `@ktbsh/ui@0.4.2`)
 
 ## Deferred / out of scope for blog phase
 
@@ -50,7 +51,7 @@ Ordered work for agents. Check items when the PR merges. One branch/PR per activ
 
 ## Next (operator / other repo)
 
-1. **Site integration** — in **`astro-blog-md`** (separate boundary): install `@ktbsh/ui@0.4.1`, load themes/fonts, swap Astro chrome (toggles, tags, TOC, scroll-top, pagination, etc.). Do **not** rewrite articles as components.
+1. **Site integration** — in **`astro-blog-md`** (separate boundary): install `@ktbsh/ui@0.4.2`, load themes/fonts, swap Astro chrome (toggles, tags, TOC, scroll-top, pagination, etc.). Do **not** rewrite articles as components.
 2. **Feedback loop** — if integration needs a fix or missing prop, open a focused PR **here**.
 3. **Optional DS growth** — backlog below only when asked.
 

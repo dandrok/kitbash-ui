@@ -4,7 +4,7 @@
 
 ## What this repo is
 
-`@ktbsh/ui` — product design system authored with `@ktbsh/sdk`. **Published:** **0.4.1**.
+`@ktbsh/ui` — product design system authored with `@ktbsh/sdk`. **Published:** **0.4.2**.
 
 - Author: `defineComponent` in `src/components/*.ts`
 - Build: `kitbash build` → `dist/vanilla`, `dist/react`, CEM + themes
